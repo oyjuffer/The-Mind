@@ -6,9 +6,13 @@
 import SwiftUI
 
 struct ContentView: View {
+    var game: Interpreter
     
     @State var level = 8
     var values = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+    
+    @State var bots = 3
+    var bot = ["😃", "😎", "😴"]
     
     var body: some View {
         
@@ -16,15 +20,22 @@ struct ContentView: View {
             
             Text("Level \(level)")
             
+            LazyVGrid(columns: [GridItem(), GridItem(), GridItem()]) {
+                ForEach(bot[0..<bots], id: \.self){ bot in
+                    botView(content: bot)
+                        .aspectRatio(1/0.8, contentMode: .fit)
+                }
+            }
+            
             // game Board
             RoundedRectangle(cornerRadius: 20)
                 .stroke(.red, lineWidth: 3)
-                .frame(height: 400)
+                .frame(height: 300)
             
             // player Cards
             LazyVGrid(columns: [GridItem(), GridItem(), GridItem(), GridItem(), GridItem()]) {
-                ForEach(values[0..<level], id: \.self){ values in
-                    PlayerCard(content: values)
+                ForEach(game.playerHand){ card in
+                    playerView(card: card)
                         .aspectRatio(1/1.2, contentMode: .fit)
                 }
             }
@@ -40,7 +51,20 @@ struct ContentView: View {
 
 
 // generates player cards.
-struct PlayerCard: View {
+struct playerView: View {
+    let card: GameLogic<String>.Card
+    
+    var body: some View {
+        ZStack{
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(lineWidth: 3)
+            Text("\(card.value)")
+        }
+    }
+}
+
+// generates bot frames
+struct botView: View {
     var content: String
     
     var body: some View {
@@ -53,18 +77,10 @@ struct PlayerCard: View {
 }
 
 
-
-
-
-
-
-
-
-
-
 // This generates the preview in Xcode. Don't tinker with this.
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        let game = Interpreter()
+        ContentView(game: game)
     }
 }

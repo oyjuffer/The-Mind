@@ -9,9 +9,10 @@ import SwiftUI
 
 @main
 struct The_MindApp: App {
+    let game = Interpreter()
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(game: game)
         }
     }
 }
