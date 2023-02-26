@@ -1,8 +1,9 @@
 import Foundation
 
-struct GameLogic <cardContent>{
+struct TM_Model<cardContent>{
     var deck: Array<Card>
     var playerHand: Array<Card>
+    var boardCard: Card = Card(id: 0, value: 0)
     
     init(n: Int, level: Int){
         
@@ -18,6 +19,7 @@ struct GameLogic <cardContent>{
             if let index = deck.indices.randomElement(){
                 let card = deck.remove(at: index)
                 playerHand.append(card)
+                playerHand.sort{$0.value < $1.value}
             }
         }
     }
@@ -26,10 +28,16 @@ struct GameLogic <cardContent>{
         
     }
     
+    func winCondition(){
+
+    }
     
-    
-    func playCard (_ card: Card){
+    mutating func playCard (){
         
+        if (playerHand.count != 0){
+            boardCard = playerHand[0]
+            playerHand.removeFirst()
+        }
     }
     
     struct Card: Identifiable {

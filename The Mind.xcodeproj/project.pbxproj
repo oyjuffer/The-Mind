@@ -8,21 +8,21 @@
 
 /* Begin PBXBuildFile section */
 		6C4B510029A0EFA800001683 /* The_MindApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C4B50FF29A0EFA800001683 /* The_MindApp.swift */; };
-		6C4B510229A0EFA800001683 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C4B510129A0EFA800001683 /* ContentView.swift */; };
+		6C4B510229A0EFA800001683 /* TM_View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C4B510129A0EFA800001683 /* TM_View.swift */; };
 		6C4B510429A0EFAA00001683 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6C4B510329A0EFAA00001683 /* Assets.xcassets */; };
 		6C4B510729A0EFAA00001683 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6C4B510629A0EFAA00001683 /* Preview Assets.xcassets */; };
-		6CDEA7A929AA2ED70015F9D1 /* GameLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CDEA7A829AA2ED70015F9D1 /* GameLogic.swift */; };
-		6CDEA7AB29AA34D80015F9D1 /* Interpreter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CDEA7AA29AA34D80015F9D1 /* Interpreter.swift */; };
+		6CDEA7A929AA2ED70015F9D1 /* TM_Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CDEA7A829AA2ED70015F9D1 /* TM_Model.swift */; };
+		6CDEA7AB29AA34D80015F9D1 /* TM_ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CDEA7AA29AA34D80015F9D1 /* TM_ViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		6C4B50FC29A0EFA800001683 /* The Mind.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "The Mind.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6C4B50FF29A0EFA800001683 /* The_MindApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = The_MindApp.swift; sourceTree = "<group>"; };
-		6C4B510129A0EFA800001683 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		6C4B510129A0EFA800001683 /* TM_View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TM_View.swift; sourceTree = "<group>"; };
 		6C4B510329A0EFAA00001683 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6C4B510629A0EFAA00001683 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		6CDEA7A829AA2ED70015F9D1 /* GameLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameLogic.swift; sourceTree = "<group>"; };
-		6CDEA7AA29AA34D80015F9D1 /* Interpreter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Interpreter.swift; sourceTree = "<group>"; };
+		6CDEA7A829AA2ED70015F9D1 /* TM_Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TM_Model.swift; sourceTree = "<group>"; };
+		6CDEA7AA29AA34D80015F9D1 /* TM_ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TM_ViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,9 +56,9 @@
 			isa = PBXGroup;
 			children = (
 				6C4B50FF29A0EFA800001683 /* The_MindApp.swift */,
-				6C4B510129A0EFA800001683 /* ContentView.swift */,
-				6CDEA7A829AA2ED70015F9D1 /* GameLogic.swift */,
-				6CDEA7AA29AA34D80015F9D1 /* Interpreter.swift */,
+				6C4B510129A0EFA800001683 /* TM_View.swift */,
+				6CDEA7A829AA2ED70015F9D1 /* TM_Model.swift */,
+				6CDEA7AA29AA34D80015F9D1 /* TM_ViewModel.swift */,
 				6C4B510329A0EFAA00001683 /* Assets.xcassets */,
 				6C4B510529A0EFAA00001683 /* Preview Content */,
 			);
@@ -143,9 +143,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6C4B510229A0EFA800001683 /* ContentView.swift in Sources */,
-				6CDEA7A929AA2ED70015F9D1 /* GameLogic.swift in Sources */,
-				6CDEA7AB29AA34D80015F9D1 /* Interpreter.swift in Sources */,
+				6C4B510229A0EFA800001683 /* TM_View.swift in Sources */,
+				6CDEA7A929AA2ED70015F9D1 /* TM_Model.swift in Sources */,
+				6CDEA7AB29AA34D80015F9D1 /* TM_ViewModel.swift in Sources */,
 				6C4B510029A0EFA800001683 /* The_MindApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
