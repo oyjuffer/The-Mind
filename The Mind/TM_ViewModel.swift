@@ -13,7 +13,6 @@ class TM_ViewModel: ObservableObject{
     }
     
     var boardCard: TM_Model<String>.Card{
-        print(model.boardCard.value)
         return model.boardCard
     }
     
@@ -27,7 +26,7 @@ class TM_ViewModel: ObservableObject{
         
     }
     
-    func playExit(){
-        
+    func playReset(){
+        model.playReset()
     }
 }

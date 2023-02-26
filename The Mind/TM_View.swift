@@ -8,8 +8,6 @@ import SwiftUI
 struct TM_View: View {
     @ObservedObject var game: TM_ViewModel
     
-    @State var level = 8
-
     @State var bots = 3
     var bot = ["😃", "😎", "😴"]
     
@@ -17,8 +15,25 @@ struct TM_View: View {
         
         VStack {
             
-            Text("Level \(level)")
-            
+            //reset button
+            HStack(){
+                
+                Spacer()
+                
+                ZStack{
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(.red, lineWidth: 3)
+                        .aspectRatio(1, contentMode: .fit)
+                        .frame(width: /*@START_MENU_TOKEN@*/25.0/*@END_MENU_TOKEN@*/, height: /*@START_MENU_TOKEN@*/25.0/*@END_MENU_TOKEN@*/)
+                    
+                    Button {
+                        game.playReset()
+                    } label: {
+                        Text("X")
+                    }
+                }
+                
+            }
             // bot view
             LazyVGrid(columns: [GridItem(), GridItem(), GridItem()]) {
                 ForEach(bot[0..<bots], id: \.self){ bot in
@@ -87,6 +102,7 @@ struct playerView: View {
     }
 }
 
+// generates the board
 struct boardView: View {
     let card: TM_Model<String>.Card
     
