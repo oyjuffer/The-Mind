@@ -8,6 +8,7 @@ import Foundation
 struct TM_Model<cardContent>{
     let nCards: Int = 100   // number of cards in deck
     var level: Int = 1  // would update +1 on win
+    var botStop: Bool = false
     
     var deck: Array<Card>
     var playerHand: Array<Card>
@@ -32,14 +33,14 @@ struct TM_Model<cardContent>{
         }
     }
     
-    // This loop should check the status of the three bots.
-    // Some sort of action queue where the player and the AI can place their actions.
-    // The loop would check whats in the queue and make changes so TM_View can update.
-    // The problem is that nothing else can happen while this loop is running, so the user input is ignored.
-    func gameLoop(){
-//        while(true){
-//            print("running")
-//        }
+    // This loop checks if the bots play their card.
+    // Alternatively it can track time until a play is made
+    // Eitherway dump the AI model in this function.
+    func botLoop(){
+        print("BOTS DO SOMETHING")
+        print("BOTS DO SOMETHING")
+        print("BOTS DO SOMETHING")
+        print()
     }
     
     // checks if the game has been won and either ends it or goes to next level
@@ -63,6 +64,7 @@ struct TM_Model<cardContent>{
     // restarts the game at level 1.
     mutating func playReset(){
         self = TM_Model(level: 1)
+        botStop = true
     }
     
     
