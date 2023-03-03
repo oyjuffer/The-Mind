@@ -6,19 +6,19 @@
 import SwiftUI
 
 class TM_ViewModel: ObservableObject{
-    @Published private var model: TM_Model<String> = TM_Model<String>(level: 10)
-    
-    var botStop: Bool = false
+    @Published private var model: TM_Model<String> = TM_Model<String>()
     
     init() {
-        
-        // This checks the status of the bots each second. 
-        Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { timer in
-            if self.botStop == true{
+        looper()
+    }
+    
+    // This checks the status of the bots each second.
+    func looper(){
+        Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { timer in
+            if self.model.botStop == true{
                 print("BOTS STOPPED")
                 timer.invalidate()
             }else{
-                print("BOT ACTION:")
                 self.model.botLoop()
             }
         }
@@ -43,7 +43,7 @@ class TM_ViewModel: ObservableObject{
     }
         
     func playReset(){
-        botStop = true
         model.playReset()
+        looper()
     }
 }
