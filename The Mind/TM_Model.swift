@@ -7,15 +7,12 @@ import Foundation
 
 struct TM_Model<cardContent>{
     var level: Int = 1  // would update +1 on win
-    var life: Int = 30
+    var life: Int = 3
     var joker: Int = 1
     
     var deck: Array<Card>
     var playerHand: Array<Card>
-    
     var bots: [Array<Card>]
-    
-    var bot1Hand: Array<Card>
     var boardCard: Card = Card(id: 0, value: 0)
     
     var botStop: Bool = false
@@ -23,13 +20,10 @@ struct TM_Model<cardContent>{
     init(){
         deck = Array<Card>()
         playerHand = Array<Card>()
-        bot1Hand = Array<Card>()
         bots = [Array<Card>]()
         
         deck = generateDeck()
         playerHand = generateHand()
-        bot1Hand = generateHand()
-        
         bots = [generateHand(), generateHand(), generateHand()]
     }
     
@@ -71,12 +65,10 @@ struct TM_Model<cardContent>{
             return (win != 0)
         }
         
-        
         level += 1
         deck = generateDeck()
         playerHand = generateHand()
         bots = [generateHand(), generateHand(), generateHand()]
-        bot1Hand = generateHand()
         boardCard = Card(id: 0, value: 0)
         
         print("GAME WON")
@@ -87,29 +79,28 @@ struct TM_Model<cardContent>{
     // checks if the game has been lost
     mutating func looseCondition(){
         
+        // tracks if a loss was detected.
         var loss = false
         
-        if (playerHand.count != 0 && playerHand[0].value < boardCard.value){
+        // check if player card is lower then on board.
+        while playerHand.count != 0 && playerHand[0].value < boardCard.value {
+            playerHand.removeFirst()
             loss = true
         }
-        else{
-            for i in 0..<bots.count where bots[i].count != 0 && bots[i][0].value < boardCard.value{
+        
+        // check if any bots have a card lower then on the board.
+        for i in 0..<bots.count where bots[i].count != 0 && bots[i][0].value < boardCard.value{
+            while bots[i].count != 0 && bots[i][0].value < boardCard.value{
+                bots[i].removeFirst()
                 loss = true
             }
         }
         
-        if loss == true && life > 1{
+        // if a loss was detected, they remove a life and check if the game is over.
+        if loss == true{
             life -= 1
-            while playerHand.count != 0 && playerHand[0].value < boardCard.value {playerHand.removeFirst()}
-            
-            for i in 0..<bots.count where bots[i].count != 0 && bots[i][0].value < boardCard.value{
-                while bots[i].count != 0 && bots[i][0].value < boardCard.value{bots[i].removeFirst()}
-            }
             print("LIFE LOST, \(life) left.")
-            
-        } else if loss == true && life <= 1{
-            botStop = true
-            print("GAME LOST")
+            if life <= 0 {botStop = true; print("GAME LOST")}
         }
     }
     

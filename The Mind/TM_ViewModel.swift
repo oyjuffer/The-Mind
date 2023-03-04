@@ -12,7 +12,7 @@ class TM_ViewModel: ObservableObject{
         looper()
     }
     
-    // This checks the status of the bots each second.
+    // This checks the status of the bots each 5 seconds.
     func looper(){
         Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { timer in
             if self.model.botStop == true{
