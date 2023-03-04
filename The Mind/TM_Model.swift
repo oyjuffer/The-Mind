@@ -7,22 +7,30 @@ import Foundation
 
 struct TM_Model<cardContent>{
     var level: Int = 1  // would update +1 on win
-    var botStop: Bool = false
+    var life: Int = 30
+    var joker: Int = 1
     
     var deck: Array<Card>
     var playerHand: Array<Card>
-    var bot1Hand: Array<Card>
     
+    var bots: [Array<Card>]
+    
+    var bot1Hand: Array<Card>
     var boardCard: Card = Card(id: 0, value: 0)
-    var running: Bool = false
+    
+    var botStop: Bool = false
+    
     init(){
         deck = Array<Card>()
         playerHand = Array<Card>()
         bot1Hand = Array<Card>()
+        bots = [Array<Card>]()
         
         deck = generateDeck()
         playerHand = generateHand()
         bot1Hand = generateHand()
+        
+        bots = [generateHand(), generateHand(), generateHand()]
     }
     
     // MARK: - GAME CONTROL
@@ -50,52 +58,79 @@ struct TM_Model<cardContent>{
     
     // checks if the game has been won and generates the next level
     mutating func winCondition() -> Bool{
-
-        if playerHand.count == 0 && bot1Hand.count == 0{
-            level += 1
-            deck = generateDeck()
-            playerHand = generateHand()
-            bot1Hand = generateHand()
-            boardCard = Card(id: 0, value: 0)
-            
-            print("WIN")
-            return true
+        
+        var win = 1
+        
+        if (playerHand.count != 0){
+            win *= 0
+            return (win != 0)
         }
-        return false
+        
+        for i in 0..<bots.count where bots[i].count != 0{
+            win *= 0
+            return (win != 0)
+        }
+        
+        
+        level += 1
+        deck = generateDeck()
+        playerHand = generateHand()
+        bots = [generateHand(), generateHand(), generateHand()]
+        bot1Hand = generateHand()
+        boardCard = Card(id: 0, value: 0)
+        
+        print("GAME WON")
+        return (win != 0)
+        
     }
     
     // checks if the game has been lost
     mutating func looseCondition(){
         
-        if playerHand.count != 0 && playerHand[0].value < boardCard.value{
-            botStop = true
-            print("USER LOST")
+        var loss = false
+        
+        if (playerHand.count != 0 && playerHand[0].value < boardCard.value){
+            loss = true
+        }
+        else{
+            for i in 0..<bots.count where bots[i].count != 0 && bots[i][0].value < boardCard.value{
+                loss = true
+            }
         }
         
-        if bot1Hand.count != 0 && bot1Hand[0].value < boardCard.value{
+        if loss == true && life > 1{
+            life -= 1
+            while playerHand.count != 0 && playerHand[0].value < boardCard.value {playerHand.removeFirst()}
+            
+            for i in 0..<bots.count where bots[i].count != 0 && bots[i][0].value < boardCard.value{
+                while bots[i].count != 0 && bots[i][0].value < boardCard.value{bots[i].removeFirst()}
+            }
+            print("LIFE LOST, \(life) left.")
+            
+        } else if loss == true && life <= 1{
             botStop = true
-            print("BOT LOST")
+            print("GAME LOST")
         }
-
     }
+    
     // restarts the game at level 1.
     mutating func playReset(){
         self = TM_Model()
     }
     
     // MARK: - USER CONTROL
+    // plays a card
     mutating func playCard (){
-        
         if (playerHand.count != 0){
             boardCard = playerHand[0]
             playerHand.removeFirst()
-            
-            if !winCondition(){
-                looseCondition()
-            }
+        }
+        if !winCondition(){
+            looseCondition()
         }
     }
     
+    // signals that a joker wants to be played
     mutating func playJoker(){
     }
     
@@ -103,28 +138,29 @@ struct TM_Model<cardContent>{
     // This loop checks whether the bots play their card each second.
     mutating func botLoop(){
         
-        if bot1Hand.count != 0 {
+        print("\nBOTS EVALUATING:")
+        
+        for i in 0..<bots.count where bots[i].count != 0{
             
             let random = Float.random(in: 1..<100)
-            let difference = (Float(100) - Float(bot1Hand[0].value - boardCard.value)) / 1.5
+            let difference = (Float(100) - Float(bots[i][0].value - boardCard.value)) / 1.8
             
-            print("\nBOTS EVALUATING:")
-            print("BOT1 Roll: \(difference) > \(random)")
+            print("BOT\(i) Roll: \(difference) > \(random)")
             
             if difference > random{
-                bot1Hand = botPlayCard(hand: bot1Hand)
+                bots[i] = botPlayCard(hand: bots[i])
             }
-            
-            if !winCondition(){
-                looseCondition()
-            }
-            
-            
+        }
+        
+        if !winCondition(){
+            looseCondition()
         }
     }
     
+    // plays the bots card
     mutating func botPlayCard(hand: Array<Card>) -> Array<Card>{
         var hand = hand
+        
         if (hand.count != 0){
             boardCard = hand[0]
             hand.removeFirst()
@@ -132,12 +168,12 @@ struct TM_Model<cardContent>{
         return hand
     }
     
-
+    
     // MARK: - Card
     // card structure that contains and ID and the card value. cardContent can be added later if we want to add an image.
     struct Card: Identifiable {
         var id: Int
         var value: Int
-//        var content: cardContent
+        //        var content: cardContent
     }
 }
