@@ -44,7 +44,7 @@ struct TM_Model<cardContent>{
             if let index = deck.indices.randomElement(){
                 let card = deck.remove(at: index)
                 hand.append(card)
-                hand.sort{$0.value < $1.value}
+                hand.sort{$0.value > $1.value}
             }
         }
         return hand
@@ -83,15 +83,15 @@ struct TM_Model<cardContent>{
         var loss = false
         
         // check if player card is lower then on board.
-        while playerHand.count != 0 && playerHand[0].value < boardCard.value {
-            playerHand.removeFirst()
+        while playerHand.count != 0 && playerHand[playerHand.count - 1].value < boardCard.value {
+            playerHand.removeLast()
             loss = true
         }
         
         // check if any bots have a card lower then on the board.
-        for i in 0..<bots.count where bots[i].count != 0 && bots[i][0].value < boardCard.value{
-            while bots[i].count != 0 && bots[i][0].value < boardCard.value{
-                bots[i].removeFirst()
+        for i in 0..<bots.count where bots[i].count != 0 && bots[i][bots[i].count - 1].value < boardCard.value{
+            while bots[i].count != 0 && bots[i][bots[i].count - 1].value < boardCard.value{
+                bots[i].removeLast()
                 loss = true
             }
         }
@@ -113,8 +113,8 @@ struct TM_Model<cardContent>{
     // plays a card
     mutating func playCard (){
         if (playerHand.count != 0){
-            boardCard = playerHand[0]
-            playerHand.removeFirst()
+            boardCard = playerHand[playerHand.count - 1]
+            playerHand.removeLast()
         }
         if !winCondition(){
             looseCondition()
@@ -153,8 +153,8 @@ struct TM_Model<cardContent>{
         var hand = hand
         
         if (hand.count != 0){
-            boardCard = hand[0]
-            hand.removeFirst()
+            boardCard = hand[hand.count - 1]
+            hand.removeLast()
         }
         return hand
     }
@@ -165,6 +165,6 @@ struct TM_Model<cardContent>{
     struct Card: Identifiable {
         var id: Int
         var value: Int
-        //        var content: cardContent
+        var filename: String {return "\(value)"}
     }
 }
