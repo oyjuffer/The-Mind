@@ -38,6 +38,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0EBE46A429BB40CA009753F8 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		6C4B50F329A0EFA800001683 = {
 			isa = PBXGroup;
 			children = (
@@ -57,6 +64,7 @@
 		6C4B50FE29A0EFA800001683 /* The Mind */ = {
 			isa = PBXGroup;
 			children = (
+				0EBE46A429BB40CA009753F8 /* Views */,
 				6C4B50FF29A0EFA800001683 /* The_MindApp.swift */,
 				6CF2C8E229B8E78F00567E7B /* AI_Model.swift */,
 				6C4B510129A0EFA800001683 /* TM_View.swift */,
