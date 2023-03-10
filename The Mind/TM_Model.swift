@@ -17,6 +17,9 @@ struct TM_Model<cardContent>{
     
     var botStop: Bool = false
     
+    // This would be the AI model.
+    var model = Model()
+    
     init(){
         deck = Array<Card>()
         playerHand = Array<Card>()
