@@ -114,7 +114,7 @@ struct TM_View: View {
 // background image
 struct backgroundView: View {
     var body: some View {
-        Image("Background")
+        Image("background")
             .resizable()
             .scaledToFill()
             .edgesIgnoringSafeArea(.all)
@@ -239,7 +239,6 @@ struct botView: View {
             Image("happy")
                 .resizable()
                 .frame(width: 70.0, height: 70.0)
-                
         }
     }
 }
