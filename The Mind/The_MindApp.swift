@@ -9,7 +9,7 @@ struct The_MindApp: App {
     let game = TM_ViewModel()
     var body: some Scene {
         WindowGroup {
-            TM_View(game: game)
+            MainView(game: game)
         }
     }
 }

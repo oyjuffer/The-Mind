@@ -1,13 +1,13 @@
 //
-//  ContentView.swift
-//  The Mind
+//  GameView.swift
 //
+//  This is the game view which displays the game when it is running.
 
 import SwiftUI
 
 public var syncPressed = false
 
-struct TM_View: View {
+struct GameView: View {
     @ObservedObject var game: TM_ViewModel
     
     @State private var cardOffset: CGSize = .zero
@@ -20,7 +20,6 @@ struct TM_View: View {
         
         ZStack{
             backgroundView()
-            
             
             VStack {
                 
@@ -240,14 +239,5 @@ struct botView: View {
                 .resizable()
                 .frame(width: 70.0, height: 70.0)
         }
-    }
-}
-
-
-// This generates the preview in Xcode. Don't tinker with this.
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        let game = TM_ViewModel()
-        TM_View(game: game)
     }
 }
