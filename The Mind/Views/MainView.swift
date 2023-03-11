@@ -15,11 +15,18 @@ import SwiftUI
 //  - Postgamescreen?
 
 
+// Check which view to display on the screen. 
 struct MainView: View {
     @ObservedObject var game: TM_ViewModel
     
     var body: some View {
-        GameView(game: game)
+        
+        if game.gameState == 1{
+            MenuView(game: game)
+        }
+        else if game.gameState == 2{
+            GameView(game: game)
+        }
     }
 }
 

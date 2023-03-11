@@ -27,6 +27,7 @@
 		6C4B510029A0EFA800001683 /* The_MindApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C4B50FF29A0EFA800001683 /* The_MindApp.swift */; };
 		6C4B510429A0EFAA00001683 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6C4B510329A0EFAA00001683 /* Assets.xcassets */; };
 		6C4B510729A0EFAA00001683 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6C4B510629A0EFAA00001683 /* Preview Assets.xcassets */; };
+		6CA9C41829BCC72600B0C718 /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CA9C41729BCC72600B0C718 /* MenuView.swift */; };
 		6CDEA7A929AA2ED70015F9D1 /* TM_Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CDEA7A829AA2ED70015F9D1 /* TM_Model.swift */; };
 		6CDEA7AB29AA34D80015F9D1 /* TM_ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CDEA7AA29AA34D80015F9D1 /* TM_ViewModel.swift */; };
 /* End PBXBuildFile section */
@@ -53,6 +54,7 @@
 		6C4B50FF29A0EFA800001683 /* The_MindApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = The_MindApp.swift; sourceTree = "<group>"; };
 		6C4B510329A0EFAA00001683 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6C4B510629A0EFAA00001683 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		6CA9C41729BCC72600B0C718 /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
 		6CDEA7A829AA2ED70015F9D1 /* TM_Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TM_Model.swift; sourceTree = "<group>"; };
 		6CDEA7AA29AA34D80015F9D1 /* TM_ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TM_ViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -95,6 +97,7 @@
 			children = (
 				0EBE46A529BB4470009753F8 /* GameView.swift */,
 				0EBE46A729BB466A009753F8 /* MainView.swift */,
+				6CA9C41729BCC72600B0C718 /* MenuView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -214,6 +217,7 @@
 				6CDEA7AB29AA34D80015F9D1 /* TM_ViewModel.swift in Sources */,
 				0E447FDD29BB50FB00439796 /* Support.swift in Sources */,
 				0E447FDB29BB50FB00439796 /* SlotCondition.swift in Sources */,
+				6CA9C41829BCC72600B0C718 /* MenuView.swift in Sources */,
 				0E447FD829BB50FB00439796 /* Temporal.swift in Sources */,
 				0E447FDF29BB50FB00439796 /* Declarative.swift in Sources */,
 				0E447FE029BB50FB00439796 /* Chunk.swift in Sources */,

@@ -35,7 +35,7 @@ struct GameView: View {
                             .frame(width: /*@START_MENU_TOKEN@*/25.0/*@END_MENU_TOKEN@*/, height: /*@START_MENU_TOKEN@*/25.0/*@END_MENU_TOKEN@*/)
                         
                         Button {
-                            game.playReset()
+                            game.reset()
                         } label: {
                             Text("X")
                         }

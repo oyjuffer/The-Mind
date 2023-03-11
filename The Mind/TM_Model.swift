@@ -6,16 +6,23 @@
 import Foundation
 
 struct TM_Model<cardContent>{
+    var gameState: Int = 1
+    // 1 = Main Menu
+    // 2 = Game
+    // 3 = Instructions
+    // 4 = Button 3
+    
+    // Variables relating the game setup.
     var level: Int = 1  // would update +1 on win
     var life: Int = 3
     var joker: Int = 1
+    var botsActive: Bool = false
     
     var deck: Array<Card>
     var playerHand: Array<Card>
     var bots: [Array<Card>]
     var boardCard: Card = Card(id: 0, value: 0)
     
-    var botStop: Bool = false
     
     // This would be the AI model.
     var model = Model()
@@ -30,7 +37,7 @@ struct TM_Model<cardContent>{
         bots = [generateHand(), generateHand(), generateHand()]
     }
     
-    // MARK: - GAME CONTROL
+    // MARK: - GAME LOGIC
     // generates a deck of 100 cards.
     mutating func generateDeck() -> Array<Card>{
         var deck = Array<Card>()
@@ -40,7 +47,7 @@ struct TM_Model<cardContent>{
         return deck
     }
     
-    // generates a hand of cards based on level, sorted lowest value first.
+    // generates a hand of cards based on level, sorted highest value first.
     mutating func generateHand() -> Array<Card>{
         var hand = Array<Card>()
         for _ in 0..<level{
@@ -103,16 +110,25 @@ struct TM_Model<cardContent>{
         if loss == true{
             life -= 1
             print("LIFE LOST, \(life) left.")
-            if life <= 0 {botStop = true; print("GAME LOST")}
+            if life <= 0 {botsActive = false; print("GAME LOST")}
         }
     }
     
+    // MARK: - MENU CONTROL
+    
+    // starts the game
+    mutating func play(){
+        gameState = 2
+        botsActive = true
+    }
+    
     // restarts the game at level 1.
-    mutating func playReset(){
+    mutating func reset(){
         self = TM_Model()
     }
     
-    // MARK: - USER CONTROL
+    // MARK: - GAME CONTROLS
+    
     // plays a card
     mutating func playCard (){
         if (playerHand.count != 0){
@@ -129,7 +145,7 @@ struct TM_Model<cardContent>{
     }
     
     // MARK: - BOT CONTROL
-    // This loop checks whether the bots play their card each second.
+    // This loop checks whether the stupid bots play their card each 5 seconds.
     mutating func botLoop(){
         
         print("\nBOTS EVALUATING:")
