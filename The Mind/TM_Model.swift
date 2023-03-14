@@ -25,7 +25,11 @@ struct TM_Model<cardContent>{
     
     
     // This would be the AI model.
-    var model = Model()
+    var model1 = Model()
+    var model2 = Model()
+    var model3 = Model()
+    
+    var change: Bool = true
     
     init(){
         deck = Array<Card>()
@@ -148,6 +152,58 @@ struct TM_Model<cardContent>{
     // This loop checks whether the stupid bots play their card each 5 seconds.
     mutating func botLoop(){
         
+//        var playTime1: Double = 0
+//        var allPlayTimes: Array = [Array<Double>]()
+//        var allCards: Array = [Array<Any>]()
+//
+//        var currentDifference: Int = abs(boardCard.value - allCards)
+//
+//        // true when a card has been played
+//        if change == true {
+//
+//            // predicts the play time
+//            var bot1.playTime; model1; card1; bot1.joker = predict()
+//            var bot2.playTime; model2; card2; bot2.joker = predict()
+//            var bot3.playTime; model3; card3; bot3.joker = predict()
+//
+//            // room to improve the strat here:
+//
+//
+//            change = false
+//
+//        // play a bot card
+//        }else if{
+//
+//            gameTime += 1
+//
+//            if gameTime < playTime{
+//                // play card
+//                // change = true
+//                // create chunk
+//                let newChunk = Chunk()
+//
+//                // add the chunk to models
+//                model1.addEncounter(newChunk)
+//                model2.addEncounter(newChunk)
+//                model3.addEncounter(newChunk)
+//
+//                // append all playtiems to array
+//                allPlayTimes.append(playTime1)
+//                allPlayTimes.append(playTime2)
+//                allPlayTimes.append(playTime3)
+//
+//                ]}
+//
+//
+//            // find lowest RT
+//            // tell that bot to play that card
+//
+//            botPlayCard(hand: <#T##Array<Card>#>)
+//
+//            // if played, then change = true
+//            change = true
+//        }
+        
         print("\nBOTS EVALUATING:")
         
         for i in 0..<bots.count where bots[i].count != 0{
@@ -178,6 +234,40 @@ struct TM_Model<cardContent>{
         return hand
     }
     
+    // MARK: - ACT-R Functions
+    
+    mutating func noise(_ s: Double) -> Double{
+        let rand = Double.random(in: 0.001...0.999)
+        return s * log((1 - rand) / rand)
+    }
+    
+    mutating func timetoPulse(_ time: Double, t_0: Double = 0.011, a: Double = 1.1, b: Double = 0.015, addNoise: Bool = true ) -> Int{
+        var pulses = 0
+        var pulseDuration = t_0
+        var t = time
+        
+        while t >= pulseDuration{
+            t -= pulseDuration
+            pulses += 1
+            pulseDuration = a * pulseDuration + (addNoise ? noise(b * a * pulseDuration): 0.0)
+        }
+        
+        return pulses
+    }
+    
+    mutating func pulsestoTime(_ pulses: Int, t_0: Double = 0.011, a: Double = 1.1, b: Double = 0.015, addNoise: Bool = true ) -> Double{
+        var time = 0.0
+        var pulseDuration = t_0
+        var remainingPulses = pulses
+        
+        while remainingPulses > 0{
+            time += pulseDuration
+            remainingPulses -= 1
+            pulseDuration = a * pulseDuration + (addNoise ? noise(b * a * pulseDuration): 0.0)
+        }
+        
+        return time
+    }
     
     // MARK: - Card
     // card structure that contains and ID and the card value. cardContent can be added later if we want to add an image.
@@ -185,5 +275,12 @@ struct TM_Model<cardContent>{
         var id: Int
         var value: Int
         var filename: String {return "\(value)"}
+    }
+    
+    struct bot: Identifiable {
+        var id: Int
+        var playTime: Double
+        var joker: Int
+        var hand: Array<Card>
     }
 }
