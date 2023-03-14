@@ -20,25 +20,25 @@ struct TM_Model<cardContent>{
     
     var deck: Array<Card>
     var playerHand: Array<Card>
-    var bots: [Array<Card>]
+    var bots: Array<Bot>
+    
     var boardCard: Card = Card(id: 0, value: 0)
     
-    
-    // This would be the AI model.
-    var model1 = Model()
-    var model2 = Model()
-    var model3 = Model()
-    
-    var change: Bool = true
+    var gameChange: Bool = true
+    var gameTime: Float = 0.0
     
     init(){
         deck = Array<Card>()
         playerHand = Array<Card>()
-        bots = [Array<Card>]()
+        bots = Array<Bot>()
         
         deck = generateDeck()
         playerHand = generateHand()
-        bots = [generateHand(), generateHand(), generateHand()]
+        
+        for i in 0...2{
+            let bot = Bot(id: i, hand: generateHand())
+            bots.append(bot)
+        }
     }
     
     // MARK: - GAME LOGIC
@@ -51,7 +51,7 @@ struct TM_Model<cardContent>{
         return deck
     }
     
-    // generates a hand of cards based on level, sorted highest value first.
+    // generates a hand of cards based on level, stacked with lowest first.
     mutating func generateHand() -> Array<Card>{
         var hand = Array<Card>()
         for _ in 0..<level{
@@ -74,16 +74,22 @@ struct TM_Model<cardContent>{
             return (win != 0)
         }
         
-        for i in 0..<bots.count where bots[i].count != 0{
+        for i in 0..<bots.count where bots[i].hand.count != 0{
             win *= 0
             return (win != 0)
         }
         
+        // Generate the next level
         level += 1
         deck = generateDeck()
         playerHand = generateHand()
-        bots = [generateHand(), generateHand(), generateHand()]
+        
+        for i in 0...2{
+            bots[i].hand = generateHand()
+        }
+        
         boardCard = Card(id: 0, value: 0)
+        gameChange = true
         
         print("GAME WON")
         return (win != 0)
@@ -101,11 +107,10 @@ struct TM_Model<cardContent>{
             playerHand.removeLast()
             loss = true
         }
-        
-        // check if any bots have a card lower then on the board.
-        for i in 0..<bots.count where bots[i].count != 0 && bots[i][bots[i].count - 1].value < boardCard.value{
-            while bots[i].count != 0 && bots[i][bots[i].count - 1].value < boardCard.value{
-                bots[i].removeLast()
+                
+        for i in 0..<bots.count where bots[i].hand.count != 0 && bots[i].hand.last!.value < boardCard.value{
+            while bots[i].hand.count != 0 && bots[i].hand.last!.value < boardCard.value{
+                bots[i].hand.removeLast()
                 loss = true
             }
         }
@@ -115,6 +120,7 @@ struct TM_Model<cardContent>{
             life -= 1
             print("LIFE LOST, \(life) left.")
             if life <= 0 {botsActive = false; print("GAME LOST")}
+            gameChange = true
         }
     }
     
@@ -131,14 +137,17 @@ struct TM_Model<cardContent>{
         self = TM_Model()
     }
     
-    // MARK: - GAME CONTROLS
+    // MARK: - USER CONTROL
     
-    // plays a card
+    // user plays a card
     mutating func playCard (){
         if (playerHand.count != 0){
             boardCard = playerHand[playerHand.count - 1]
             playerHand.removeLast()
         }
+        
+        gameChange = true
+        
         if !winCondition(){
             looseCondition()
         }
@@ -152,69 +161,47 @@ struct TM_Model<cardContent>{
     // This loop checks whether the stupid bots play their card each 5 seconds.
     mutating func botLoop(){
         
-//        var playTime1: Double = 0
-//        var allPlayTimes: Array = [Array<Double>]()
-//        var allCards: Array = [Array<Any>]()
-//
-//        var currentDifference: Int = abs(boardCard.value - allCards)
-//
-//        // true when a card has been played
-//        if change == true {
-//
-//            // predicts the play time
-//            var bot1.playTime; model1; card1; bot1.joker = predict()
-//            var bot2.playTime; model2; card2; bot2.joker = predict()
-//            var bot3.playTime; model3; card3; bot3.joker = predict()
-//
-//            // room to improve the strat here:
-//
-//
-//            change = false
-//
-//        // play a bot card
-//        }else if{
-//
-//            gameTime += 1
-//
-//            if gameTime < playTime{
-//                // play card
-//                // change = true
-//                // create chunk
-//                let newChunk = Chunk()
-//
-//                // add the chunk to models
-//                model1.addEncounter(newChunk)
-//                model2.addEncounter(newChunk)
-//                model3.addEncounter(newChunk)
-//
-//                // append all playtiems to array
-//                allPlayTimes.append(playTime1)
-//                allPlayTimes.append(playTime2)
-//                allPlayTimes.append(playTime3)
-//
-//                ]}
-//
-//
-//            // find lowest RT
-//            // tell that bot to play that card
-//
-//            botPlayCard(hand: <#T##Array<Card>#>)
-//
-//            // if played, then change = true
-//            change = true
-//        }
+        gameTime += 1
         
-        print("\nBOTS EVALUATING:")
-        
-        for i in 0..<bots.count where bots[i].count != 0{
+        // if a change on the board was made, the bot prediction will be recalculated.
+        // if not, the game waits till the timer ticks over the prediction to play the card
+        if gameChange == true{
             
-            let random = Float.random(in: 1..<100)
-            let difference = (Float(100) - Float(bots[i][0].value - boardCard.value)) / 1.8
+            print("\nBOTS UPDATING MODEL")
             
-            print("BOT\(i) Roll: \(difference) > \(random)")
+            for i in 0..<bots.count{
+                
+                // stupid bot
+                // this estimate needs to be replaced by the act-r estimate for when to play
+                if bots[i].hand.count != 0 {
+                    bots[i].estimate = Float(bots[i].hand.last!.value - boardCard.value) + gameTime
+                }
+                else{
+                    // no cards in hand anymore
+                    bots[i].estimate = -1
+                }
+            }
             
-            if difference > random{
-                bots[i] = botPlayCard(hand: bots[i])
+            // sort according to lowest estimate first, meaning the bot[0] plays first
+            bots = bots.sorted{$0.estimate < $1.estimate}
+            
+            gameChange = false
+        }
+        else{
+            
+            print("\nBOTS:")
+            print("gameTime: \(gameTime)")
+            
+            for i in 0..<bots.count{
+                
+                if bots[i].estimate != -1 && (bots[i].estimate <= gameTime || emptyHand(id: bots[i].id) == true){
+                    print("BOT \(bots[i].id) PLAYING CARD: \(bots[i].hand.last!.value)")
+                    bots[i].hand = botPlayCard(hand: bots[i].hand)
+                    
+                    gameChange = true
+                    break
+                }
+                print("\(bots[i].id): \(bots[i].estimate)s")
             }
         }
         
@@ -232,6 +219,25 @@ struct TM_Model<cardContent>{
             hand.removeLast()
         }
         return hand
+    }
+    
+    // checks if a bot should empty their hand because they are the last left with cards
+    mutating func emptyHand(id: Int) -> Bool{
+        let id = id
+        
+        if playerHand.count != 0{
+            return false
+        }
+        
+        for i in 0..<bots.count where id != bots[i].id{
+            
+            if bots[i].hand.count != 0{
+                return false
+            }
+        }
+        
+        print("emptying hand -->")
+        return true
     }
     
     // MARK: - ACT-R Functions
@@ -277,10 +283,12 @@ struct TM_Model<cardContent>{
         var filename: String {return "\(value)"}
     }
     
-    struct bot: Identifiable {
+    // MARK: - Bot
+    struct Bot {
         var id: Int
-        var playTime: Double
-        var joker: Int
+        var model = Model()
         var hand: Array<Card>
+        var estimate: Float = 100.0
+        var emotion = 0
     }
 }
