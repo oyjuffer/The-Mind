@@ -49,6 +49,6 @@ class TM_ViewModel: ObservableObject{
     }
         
     func playJoker(){
-            
+        model.playJoker()
     }
 }

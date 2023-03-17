@@ -11,10 +11,13 @@ struct TM_Model<cardContent>{
     // 2 = Game
     // 3 = Instructions
     // 4 = Button 3
+    // 5 = winScreen
+    // 6 = loseScreen
     
     // Variables relating the game setup.
     var level: Int = 1  // would update +1 on win
     var life: Int = 3
+    var previousLife: Int = 3
     var joker: Int = 1
     var botsActive: Bool = false
     
@@ -26,6 +29,12 @@ struct TM_Model<cardContent>{
     
     var gameChange: Bool = true
     var gameTime: Float = 0.0
+//    var gameBuffer: Card
+    
+    
+    // bot AI variables
+    var trialNr: Int = 0
+    var lowestRT: Double = 0
     
     init(){
         deck = Array<Card>()
@@ -110,6 +119,9 @@ struct TM_Model<cardContent>{
                 
         for i in 0..<bots.count where bots[i].hand.count != 0 && bots[i].hand.last!.value < boardCard.value{
             while bots[i].hand.count != 0 && bots[i].hand.last!.value < boardCard.value{
+                
+//                let lastCard = bots[i].hand.last!.value
+                
                 bots[i].hand.removeLast()
                 loss = true
             }
@@ -117,10 +129,26 @@ struct TM_Model<cardContent>{
         
         // if a loss was detected, they remove a life and check if the game is over.
         if loss == true{
+            previousLife = life
             life -= 1
             print("LIFE LOST, \(life) left.")
             if life <= 0 {botsActive = false; print("GAME LOST")}
             gameChange = true
+            
+            // for each bot we make a new chunk on fail
+            
+        } else {
+            previousLife = life
+            
+//            for i in 0..<bots.count where bots[i].hand.count != 0{
+//
+//                // For each bot we make a new chunk on successful play.
+////                let chunk = Chunk(s: "success\(trialNr) card \(boardCard.value)", m: bots[i].model)
+////                chunk.setSlot(slot: "currentDifference", value: Double(abs(boardCard.value - bots[i].hand.last!.value)))
+////                chunk.setSlot(slot: "temporalProfile", value: Double(time_to_pulses(lowestRT) - 1))
+////
+////                bots[i].model.dm.addToDM(chunk)
+//            }
         }
     }
     
@@ -147,6 +175,7 @@ struct TM_Model<cardContent>{
         }
         
         gameChange = true
+        trialNr += 1
         
         if !winCondition(){
             looseCondition()
@@ -162,6 +191,7 @@ struct TM_Model<cardContent>{
     mutating func botLoop(){
         
         gameTime += 1
+        
         
         // if a change on the board was made, the bot prediction will be recalculated.
         // if not, the game waits till the timer ticks over the prediction to play the card
@@ -184,6 +214,7 @@ struct TM_Model<cardContent>{
             
             // sort according to lowest estimate first, meaning the bot[0] plays first
             bots = bots.sorted{$0.estimate < $1.estimate}
+            lowestRT = Double(bots[0].estimate)
             
             gameChange = false
         }
@@ -218,6 +249,8 @@ struct TM_Model<cardContent>{
             boardCard = hand[hand.count - 1]
             hand.removeLast()
         }
+        
+        trialNr += 1
         return hand
     }
     
@@ -247,7 +280,7 @@ struct TM_Model<cardContent>{
         return s * log((1 - rand) / rand)
     }
     
-    mutating func timetoPulse(_ time: Double, t_0: Double = 0.011, a: Double = 1.1, b: Double = 0.015, addNoise: Bool = true ) -> Int{
+    mutating func time_to_pulses(_ time: Double, t_0: Double = 0.011, a: Double = 1.1, b: Double = 0.015, addNoise: Bool = true ) -> Int{
         var pulses = 0
         var pulseDuration = t_0
         var t = time
@@ -261,7 +294,7 @@ struct TM_Model<cardContent>{
         return pulses
     }
     
-    mutating func pulsestoTime(_ pulses: Int, t_0: Double = 0.011, a: Double = 1.1, b: Double = 0.015, addNoise: Bool = true ) -> Double{
+    mutating func pulses_to_time(_ pulses: Int, t_0: Double = 0.011, a: Double = 1.1, b: Double = 0.015, addNoise: Bool = true ) -> Double{
         var time = 0.0
         var pulseDuration = t_0
         var remainingPulses = pulses
@@ -289,6 +322,7 @@ struct TM_Model<cardContent>{
         var model = Model()
         var hand: Array<Card>
         var estimate: Float = 100.0
+        var joker: Bool = false
         var emotion = 0
     }
 }
