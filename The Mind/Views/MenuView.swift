@@ -12,20 +12,20 @@ struct MenuView: View {
     
     var body: some View {
         ZStack{
-            Image("background")
+            Image("bg_menu")
                 .resizable()
                 .scaledToFill()
                 .edgesIgnoringSafeArea(.all)
-                .opacity(0.8)
+                .padding(.bottom,150)
             
             VStack {
                 // Title at the top
-                Text("The Mind")
-                    .font(.largeTitle)
-                    .padding(.top, 50)
-                
-                // Three buttons in the middle with round corners
-                VStack(spacing: 30) {
+                Image("title")
+                    .resizable()
+                    .frame(width: 400, height: 100)
+
+                // Buttons
+                VStack(spacing: 15) {
                     Button(action: {
                         game.play()
                     }) {
@@ -33,7 +33,7 @@ struct MenuView: View {
                             .font(.title)
                             .foregroundColor(.white)
                             .frame(width: 200, height: 50)
-                            .background(Color.blue)
+                            .background(Color(#colorLiteral(red: 0.1205435768, green: 0.2792448401, blue: 0.4109080434, alpha: 1)))
                             .cornerRadius(25)
                     }
                     
@@ -44,31 +44,17 @@ struct MenuView: View {
                             .font(.title)
                             .foregroundColor(.white)
                             .frame(width: 200, height: 50)
-                            .background(Color.green)
-                            .cornerRadius(25)
-                    }
-                    
-                    Button(action: {
-                        // Action for button 3
-                    }) {
-                        Text("Button 3")
-                            .font(.title)
-                            .foregroundColor(.white)
-                            .frame(width: 200, height: 50)
-                            .background(Color.orange)
+                            .background(Color( #colorLiteral(red: 0.1205435768, green: 0.2792448401, blue: 0.4109080434, alpha: 1)))
                             .cornerRadius(25)
                     }
                 }
-                .padding(.top, 50)
+                .padding(.top, 360)
+                .padding(.bottom, 150)
                 
-                // Image at the bottom
-                Image("mascot")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: UIScreen.main.bounds.width, height: 200)
-                    .clipped()
             }
+
         }
+        
     }
 }
 
