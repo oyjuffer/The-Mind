@@ -15,7 +15,7 @@ class TM_ViewModel: ObservableObject{
                 print("BOTS STOPPED")
                 timer.invalidate()
             }else{
-                self.model.botLoop()
+                self.model.gameLoop()
             }
         }
     }
@@ -25,11 +25,11 @@ class TM_ViewModel: ObservableObject{
         return model.gameState
     }
     
-    var playerHand: Array<TM_Model<String>.Card> {
+    var playerHand: Array<Card> {
         return model.playerHand
     }
     
-    var boardCard: TM_Model<String>.Card{
+    var boardCard: Card{
         return model.boardCard
     }
     
@@ -45,7 +45,7 @@ class TM_ViewModel: ObservableObject{
     
     // MARK: - GAME CONTROLS
     func playCard(){
-        model.playCard()
+        model.playerHand = model.playCard(hand: model.playerHand)
     }
         
     func playJoker(){

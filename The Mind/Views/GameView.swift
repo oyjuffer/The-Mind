@@ -99,7 +99,7 @@ struct GameView: View {
         
     }
     
-    func geometry(for card: TM_Model<String>.Card) -> CGSize {
+    func geometry(for card: Card) -> CGSize {
         guard let index = game.playerHand.firstIndex(where: { $0.id == card.id}) else {
             return .zero
         }
@@ -198,7 +198,7 @@ struct cardView: View {
 
 // generates the board
 struct boardView: View {
-    var card: TM_Model<String>.Card
+    var card: Card
     @State private var cardOffset: CGSize = .zero
     
     var body: some View {
