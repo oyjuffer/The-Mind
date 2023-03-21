@@ -33,6 +33,7 @@ class TM_ViewModel: ObservableObject{
         return model.boardCard
     }
     
+    
     // MARK: - MENU CONTROLS
     func play(){
         model.play()
