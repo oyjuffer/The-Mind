@@ -94,7 +94,7 @@ struct TM_Model<cardContent>{
                 }
                 else{
                     // no cards in hand anymore
-                    bots[i].estimate = 100000
+                    bots[i].estimate = 10000000
                 }
             }
             
@@ -117,7 +117,10 @@ struct TM_Model<cardContent>{
                     bots[i].hand = playCard(hand: bots[i].hand)
                     break
                 }
-                print("\(bots[i].id): \(bots[i].estimate)s")
+                
+                if !bots[i].hand.isEmpty{
+                    print("\(bots[i].id): \(bots[i].estimate)s - CARD:\(bots[i].hand[bots[i].hand.count - 1].value)")
+                }
             }
         }
         
