@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct InstructionsView: View {
+    @ObservedObject var game: TM_ViewModel
     var body: some View {
         ZStack(alignment: .top){
             Image("background")
@@ -40,11 +41,5 @@ struct InstructionsView: View {
             
         }
         
-    }
-}
-
-struct InstructionsView_Previews: PreviewProvider {
-    static var previews: some View {
-        InstructionsView()
     }
 }

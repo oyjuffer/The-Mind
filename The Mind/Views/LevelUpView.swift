@@ -8,11 +8,8 @@
 import SwiftUI
 
 struct LevelUpView: View {
-//    @ObservedObject var game: TM_ViewModel
-    let level: Int
-    
-//    let continueAction: () -> Void
-        
+    @ObservedObject var game: TM_ViewModel
+
     var body: some View {
         ZStack {
             Image("background")
@@ -27,10 +24,10 @@ struct LevelUpView: View {
                 Text("Level Up!") // Display the message
                     .font(.title)
                     .fontWeight(.bold)
-                Text("Congratulations, you reached level \(level)!")
+                Text("Congratulations, you reached level \(game.level)!")
                         
                 Button("Continue") { // Button to dismiss the popup
-                    greeting() // Perform the action when the user taps the button
+                    game.resume()// Perform the action when the user taps the button
                 }
                     .padding()
                     .background(Color.blue)
@@ -42,16 +39,5 @@ struct LevelUpView: View {
                 .cornerRadius(20)
                 .shadow(radius: 20)
             }
-    }
-    
-    func greeting() {
-
-            print("Hello, World!")
-        }
-}
-
-struct LevelUpView_Previews: PreviewProvider {
-    static var previews: some View {
-        LevelUpView(level:5)
     }
 }

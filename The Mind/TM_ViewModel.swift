@@ -33,11 +33,23 @@ class TM_ViewModel: ObservableObject{
         return model.boardCard
     }
     
+    var level: Int{
+        return model.level
+    }
+    
+    var life: Int{
+        return model.life
+    }
+    
     
     // MARK: - MENU CONTROLS
     func play(){
         model.play()
         looper()
+    }
+    
+    func instructions(){
+        model.instructions()
     }
     
     func reset(){
@@ -51,5 +63,11 @@ class TM_ViewModel: ObservableObject{
         
     func playJoker(){
         model.playJoker()
+    }
+    
+    func resume(){
+        looper()
+        model.gameState = 2
+        model.botsActive = true
     }
 }

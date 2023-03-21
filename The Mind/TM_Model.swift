@@ -15,6 +15,8 @@ struct TM_Model<cardContent>{
     // 6 = Game Won
     // 7 = Game Lost
     
+    var resumeGame: Bool = true
+    
     // game
     var level: Int = 1  // would update +1 on win
     var life: Int = 3
@@ -129,8 +131,8 @@ struct TM_Model<cardContent>{
                 print("GAME WON")
             }else{
                 levelUp()
-                // add levelup screen.
-                print("LEVEL WON")
+                gameState = 4
+                botsActive = false
             }
         }
         
@@ -146,9 +148,11 @@ struct TM_Model<cardContent>{
                 removeCards()
                 life -= 1
                 lifeLost = true
-                print("LIFE LOST, \(life) left.")
                 generateChunks(bias: true)
                 gameChange = true
+                
+                gameState = 5
+                botsActive = false
             }
         }
         
@@ -267,6 +271,10 @@ struct TM_Model<cardContent>{
     mutating func play(){
         gameState = 2
         botsActive = true
+    }
+    
+    mutating func instructions(){
+        gameState = 3
     }
     
     // restarts the game at level 1 when the cross is clicked.

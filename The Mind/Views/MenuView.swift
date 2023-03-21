@@ -38,7 +38,7 @@ struct MenuView: View {
                     }
                     
                     Button(action: {
-                        // Action for button 2
+                        game.instructions()
                     }) {
                         Text("Instructions")
                             .font(.title)

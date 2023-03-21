@@ -8,11 +8,8 @@
 import SwiftUI
 
 struct LoseLifeView: View {
-    //    @ObservedObject var game: TM_ViewModel
-    let lives: Int
+        @ObservedObject var game: TM_ViewModel
         
-    //    let continueAction: () -> Void
-            
     var body: some View {
         ZStack {
             Image("background")
@@ -27,10 +24,10 @@ struct LoseLifeView: View {
                 Text("Oh no!") // Display the message
                     .font(.title)
                     .fontWeight(.bold)
-                Text("You lost a life! You have \(lives) lives left!")
+                Text("You lost a life! You have \(game.life) lives left!")
                         
                 Button("Continue") { // Button to dismiss the popup
-                    greeting() // Perform the action when the user taps the button
+                    game.resume() // Perform the action when the user taps the button
                 }
                     .padding()
                     .background(Color.blue)
@@ -43,15 +40,4 @@ struct LoseLifeView: View {
                 .shadow(radius: 20)
             }
         }
-        
-        func greeting() {
-
-                print("Hello, World!")
-            }
-}
-
-struct LoseLifeView_Previews: PreviewProvider {
-    static var previews: some View {
-        LoseLifeView(lives: 2)
-    }
 }
