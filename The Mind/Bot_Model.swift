@@ -9,7 +9,7 @@ import Foundation
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////// This function will be called by the phone and converts input to other datastructures   ///////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-func prediction(bot: Bot, nBots: Int, boardCard: Card, life: Int, lifeLost: Bool , level: Int, trial: Int, previousDeckCard: Int, RTpreviousRound: Double, totalHands: Int) -> Double{
+func prediction(bot: Bot, nBots: Int, boardCard: Card, life: Int, lifeLost: Bool , level: Int, trial: Int, previousDeckCard: Int, RTpreviousRound: Double, totalHands: Int) -> (Double, Bool, Double, Double){
 
     
     // TRANSLATION:
@@ -30,14 +30,12 @@ func prediction(bot: Bot, nBots: Int, boardCard: Card, life: Int, lifeLost: Bool
     let RTpreviousRound = RTpreviousRound
     let scalar = bot.scalar
     let level = level
-    
-    // NOT IMPLEMENTED YET
-    let jokerRequest = false
+    let jokerRequest = bot.shuriken
     
     let (rt, joker, emotion, newScalar) = onePrediction(Deck: cardsPlayerValues, minCardPlayer: minCardPlayer, tableCard: tableCard, nrOfPlayer: nrOfPlayer, JokerRequest: jokerRequest, totalLife: totalLife, PlayerAmountofCards: playerAmountOfCards, m: m, trialNr: trialNr, lifeLostpreviousRound: lifeLostPreviousRound, bot: bot, RTpreviousRound: RTpreviousRound, previoustablecard: previousDeckCard, scalar: scalar, level: level)
     
     // results of the stupid bot, until we can get this prediction function working. 
-    return rt
+    return (rt, joker, emotion, newScalar)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

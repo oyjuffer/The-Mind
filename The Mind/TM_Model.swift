@@ -82,7 +82,7 @@ struct TM_Model<cardContent>{
                 // stupid bot
                 // this estimate needs to be replaced by the act-r estimate for when to play
                 if !bots[i].hand.isEmpty {
-                    bots[i].estimate = prediction(bot: bots[i],
+                    let result = prediction(bot: bots[i],
                                                   nBots: nBots,
                                                   boardCard: boardCard,
                                                   life: life,
@@ -90,7 +90,12 @@ struct TM_Model<cardContent>{
                                                   level: level,
                                                   trial: trial,
                                                   previousDeckCard: boardCardPrevious.value,
-                                                  RTpreviousRound: shortestEstimate, totalHands: totalHands) + gameTime
+                                                  RTpreviousRound: shortestEstimate, totalHands: totalHands)
+                    
+                    bots[i].estimate = result.0 + gameTime
+                    bots[i].shuriken = result.1
+                    bots[i].emotion = result.2
+                    bots[i].scalar = result.3
                 }
                 else{
                     // no cards in hand anymore
@@ -339,6 +344,6 @@ struct TM_Model<cardContent>{
         var hand: Array<Card>
         var estimate = 100.0
         var shuriken = false
-        var emotion = 0
+        var emotion = 0.0
         var scalar = 1.0
     }
