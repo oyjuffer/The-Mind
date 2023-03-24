@@ -62,7 +62,7 @@ class TM_ViewModel: ObservableObject{
     }
         
     func playJoker(){
-        model.playJoker()
+        model.playerShuriken = true
     }
     
     func resume(){
