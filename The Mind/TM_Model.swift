@@ -35,7 +35,6 @@ struct TM_Model<cardContent>{
     // user
     var playerHand: Array<Card>
     var playerShuriken = false
-    var playerShowCard = false
     
     // bots
     var bots: Array<Bot>
@@ -120,7 +119,7 @@ struct TM_Model<cardContent>{
                 }
                 
                 if !bots[i].hand.isEmpty{
-                    print("\(bots[i].id): \(bots[i].estimate)s - CARD:\(bots[i].hand[bots[i].hand.count - 1].value)")
+                    print("\(bots[i].id): \(round(bots[i].estimate))s - CARD: \(bots[i].hand[bots[i].hand.count - 1].value) - JOKER: \(bots[i].shuriken)")
                 }
             }
         }
@@ -157,11 +156,11 @@ struct TM_Model<cardContent>{
                 botsActive = false
             }
         } else if(shurikens > 0 && bots.allSatisfy{$0.shuriken} && playerShuriken){
-            
             shurikens -= 1
             print("SHOW CARDS")
-            playerShowCard = true
-            for i in 0..<bots.count {bots[i].showCard = true}
+            // set the first card in the hands to reveal.
+            if !playerHand.isEmpty{playerHand[playerHand.count - 1].reveal = true}
+            for i in 0..<bots.count where !bots[i].hand.isEmpty{bots[i].hand[bots[i].hand.count - 1].reveal = true}
         }
         
         lifeLost = false
@@ -256,7 +255,6 @@ struct TM_Model<cardContent>{
                 return true
             }
         }
-        
         return false
     }
     
@@ -329,6 +327,7 @@ struct TM_Model<cardContent>{
 struct Card: Identifiable {
     var id: Int
     var value: Int
+    var reveal = false
     var filename: String {return "\(value)"}
 }
 
@@ -339,7 +338,6 @@ struct Bot {
     var hand: Array<Card>
     var estimate = 100.0
     var shuriken = false
-    var showCard = false
     var emotion = 0.0
     var scalar = 1.0
 }
