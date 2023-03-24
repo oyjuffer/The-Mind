@@ -21,12 +21,12 @@ let typeofActivation = "exponential " // ["linear", "exponential"," Sigmoid_cust
 
 
 
-    
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 func prediction(bot: Bot, nBots: Int, boardCard: Card, life: Int, lifeLost: Bool , level: Int, trial: Int, previousDeckCard: Int, RTpreviousRound: Double, totalHands: Int) -> (Double, Bool, Double, Double){
-
+    
     // TRANSLATION:
     let cardsPlayer = bot.hand
     var cardsPlayerValues = Array<Int>()
@@ -50,7 +50,7 @@ func prediction(bot: Bot, nBots: Int, boardCard: Card, life: Int, lifeLost: Bool
     var (rt, joker, emotion, newScalar) = onePrediction(Deck: cardsPlayerValues, minCardPlayer: minCardPlayer, tableCard: tableCard, nrOfPlayer: nrOfPlayer, JokerRequest: jokerRequest, totalLife: totalLife, PlayerAmountofCards: playerAmountOfCards, m: m, trialNr: trialNr, lifeLostpreviousRound: lifeLostPreviousRound, bot: bot, RTpreviousRound: RTpreviousRound, previoustablecard: previousDeckCard, scalar: scalar, level: level)
     
     
-//    print(minCardPlayer, "= mincard  || Difference  = ", abs(tableCard - minCardPlayer), " || rt = " , rt, " Scalar =", newScalar)
+    //    print(minCardPlayer, "= mincard  || Difference  = ", abs(tableCard - minCardPlayer), " || rt = " , rt, " Scalar =", newScalar)
     rt *= gamespeed
     
     return (rt, joker, emotion, newScalar)
@@ -94,18 +94,18 @@ func onePrediction(Deck: [Int], minCardPlayer: Int, tableCard: Int, nrOfPlayer: 
     pulses = determinePulses(m: m, Deck: Deck, nrPlayer: nrOfPlayer, tableCard: tableCard, totalLife: totalLife, trialNr: trialNr) // Counting (linear & non-linear
     
     var waiting: Double = 0.0
-        // Adaptation
+    // Adaptation
     if strategy == "Custome"{
         waiting = Double(pulses)
     }else {
         waiting = pulses_to_time(Int(pulses))
     }
-
+    
     var RT = perception_time + response_time + waiting
     switch adaptation {
-    
+        
     case 0: // NO ADAPTATION
-    RT *= 1
+        RT *= 1
         
     case 1: // LONG TERM ADAPTATION
         var scalar = scalar
@@ -115,7 +115,7 @@ func onePrediction(Deck: [Int], minCardPlayer: Int, tableCard: Int, nrOfPlayer: 
     case 2: // Short TERM ADAPTATION
         RT *= gameDifficulty(nrOfPlayer: nrOfPlayer, totalLife: totalLife, lifeLostpreviousRound: lifeLostpreviousRound, trialNr: trialNr, level: level, totalAmoundCards: PlayerAmountofCards, tableCard: tableCard, minCardPlayer: minCardPlayer)
         RT *= previousPlayAdaptation(RTpreviousRound: RTpreviousRound, previousDeckCard: previoustablecard, tableCard: tableCard, m: m)
-            
+        
     default: // LONG & Short TERM ADAPTATION
         var scalar = scalar
         scalar *= previousPlayAdaptation(RTpreviousRound: RTpreviousRound, previousDeckCard: previoustablecard, tableCard: tableCard, m: m)
@@ -123,9 +123,9 @@ func onePrediction(Deck: [Int], minCardPlayer: Int, tableCard: Int, nrOfPlayer: 
         RT *= gameDifficulty(nrOfPlayer: nrOfPlayer, totalLife: totalLife, lifeLostpreviousRound: lifeLostpreviousRound, trialNr: trialNr, level: level, totalAmoundCards: PlayerAmountofCards, tableCard: tableCard, minCardPlayer: minCardPlayer)
         RT *= previousPlayAdaptation(RTpreviousRound: RTpreviousRound, previousDeckCard: previoustablecard, tableCard: tableCard, m: m)
     }
-
-        return (RT, false, RT/4, scalar)
-    }
+    
+    return (RT, false, RT/4, scalar)
+}
 
 
 
@@ -140,7 +140,7 @@ func determinePulses(m: Model, Deck: [Int], nrPlayer: Int, tableCard: Int, total
     let chunk = Chunk(s: "retrieve", m: m)
     chunk.setSlot(slot: "currentDifference", value: currentDifference)
     let (_, memoryTrace)  = m.dm.partialRetrieve(chunk: chunk, mismatchFunction: mismatchFunction)
-
+    
     if memoryTrace == nil{
         pulses = difference_to_pulses(Double(currentDifference), tableCard: tableCard) // finetune the model (so one second is translated roughlz to one gab, however, those who are close to the card, have not one second, and those abit above are more )
         
@@ -183,7 +183,7 @@ func mismatchFunction(_ x: Value, _ y: Value) -> Double? {
             let distance = abs(x.number()! - y.number()!)
             return -distance/100
         }
-    
+        
     }
     
 }
@@ -192,7 +192,7 @@ func mismatchFunction(_ x: Value, _ y: Value) -> Double? {
 
 
 func sigmoidcustom(x: Int, tableCard: Int) -> Double{
-   
+    
     let relativePosition = (Double(x)/Double(abs(tableCard - 100)))
     if relativePosition >= 0.05{
         return Double(x)
@@ -204,15 +204,15 @@ func sigmoidcustom(x: Int, tableCard: Int) -> Double{
 }
 
 func sigmoidcustomBackWards(x: Double, tableCard: Int) -> Int{
-   
+    
     let relativePosition = Double(abs(tableCard - 100))
     let returnValue: Double
-
+    
     if x >= 0.05{
         returnValue = x
         return Int(returnValue)
     }else{
-
+        
         return Int(round(x * relativePosition))
     }
     
@@ -231,12 +231,12 @@ func previousPlayAdaptation(RTpreviousRound: Double, previousDeckCard: Int, tabl
     let chunk = Chunk(s: "chunk", m:m)
     chunk.setSlot(slot:"CurrentDifference", value: Double(currentDifference))
     let (_, retrievedChunk) = m.dm.retrieve(chunk: chunk)
-
+    
     if retrievedChunk != nil{
         
         let pulsesOfOther = Double(difference_to_pulses(RTpreviousRound, tableCard: tableCard))
         let myPulses = Double((retrievedChunk?.slotvals["temporal_profile"]?.number())!)
-
+        
         if myPulses < pulsesOfOther {
             scalar += factor
         }
@@ -245,7 +245,7 @@ func previousPlayAdaptation(RTpreviousRound: Double, previousDeckCard: Int, tabl
             scalar -= factor
         }
     }
-
+    
     return scalar
 }
 
@@ -257,26 +257,26 @@ func gameDifficulty(nrOfPlayer: Int, totalLife: Int, lifeLostpreviousRound: Bool
     
     var scale = 1.0
     let factor = factorGD
-
-
+    
+    
     // player amount difficulty
     scale -= Double(nrOfPlayer) * factor
     
-
+    
     // total life difficulty
     scale -= (4 - Double(totalLife)) * factor
     
-
+    
     // level difficulty
     scale -= Double(level) * factor
     
-
+    
     // if we lost previous round
     if lifeLostpreviousRound {
         scale -= factor
     }
     
-
+    
     // At the beginning and end of each round, the game is more difficult so player play slower
     let NrCardsBeginning = level * nrOfPlayer
     let difference = Double(abs(NrCardsBeginning - totalAmoundCards))
@@ -284,7 +284,7 @@ func gameDifficulty(nrOfPlayer: Int, totalLife: Int, lifeLostpreviousRound: Bool
         scale += difference * factor
     }
     
-
+    
     return scale
 }
 
@@ -312,39 +312,39 @@ func difference_to_pulses(_ difference: Double, tableCard: Int, t0: Double = 3, 
     }else{
         t0 = 3
     }
-
-
+    
+    
     // Activation function (linear/exponential)
     if typeofActivation == "Linear" ||  typeofActivation == "Sigmoid_custome" {// ["linear", "exponential"," Sigmoid_custome"]
         a = 1
     }else{
         a = 1.000001
     }
-
-
+    
+    
     // include noise
     if noise == false{
         b = 0
     }
-
-
+    
+    
     var pulseDuration = t0
     var pulses = 0
     var t = difference
-
-
+    
+    
     while t >= pulseDuration{
         t -= pulseDuration
         pulses += 1
         pulseDuration = a * pulseDuration + (addNoise ? noise(b * a * pulseDuration): 0.0)
     }
     pulses = Int(pulses)
-
+    
     if typeofActivation == "Sigmoid_custome"{
         return  Int(sigmoidcustom(x: pulses, tableCard: tableCard))
     }
-
-
+    
+    
     return pulses
 }
 
@@ -383,22 +383,22 @@ func pulses_to_time(_ pulses: Int, t0: Double = 3, a: Double = 1, b: Double = 0.
         }
         
     }
-        if noise == false{
-            b = 0
-        }
-        
-        var pulseDuration = t0
-        var time = 0.0
-        var remainingPulses = pulses
-        while remainingPulses > 0{
-            time += pulseDuration
-            remainingPulses -= 1
-            pulseDuration = a * pulseDuration + (addNoise ? noise(b * a * pulseDuration): 0.0)
-        }
-        
+    if noise == false{
+        b = 0
+    }
+    
+    var pulseDuration = t0
+    var time = 0.0
+    var remainingPulses = pulses
+    while remainingPulses > 0{
+        time += pulseDuration
+        remainingPulses -= 1
+        pulseDuration = a * pulseDuration + (addNoise ? noise(b * a * pulseDuration): 0.0)
+    }
+    
     return time
     
 }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+

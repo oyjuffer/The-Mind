@@ -94,7 +94,7 @@ struct TM_Model<cardContent>{
                 }
                 else{
                     // no cards in hand anymore
-                    bots[i].estimate = 10000000
+                    bots[i].estimate = 100000000
                 }
             }
             
@@ -107,8 +107,7 @@ struct TM_Model<cardContent>{
         }
         else{
             
-            print("\nBOTS:")
-            print("gameTime: \(gameTime)")
+            print("\ngameTime: \(gameTime)s")
             
             for i in 0..<bots.count{
                 
@@ -119,7 +118,9 @@ struct TM_Model<cardContent>{
                 }
                 
                 if !bots[i].hand.isEmpty{
-                    print("\(bots[i].id): \(round(bots[i].estimate))s - CARD: \(bots[i].hand[bots[i].hand.count - 1].value) - JOKER: \(bots[i].shuriken)")
+                    let x = Double(round(100 * bots[i].estimate) / 100)
+                    let y = Double(round(100 * bots[i].emotion) / 100)
+                    print("BOT \(bots[i].id) - ESTIMATE: \(x)s - CARD: \(bots[i].hand[bots[i].hand.count - 1].value) - JOKER: \(bots[i].shuriken) - EMOTION: \(y)")
                 }
             }
         }
@@ -323,7 +324,6 @@ struct TM_Model<cardContent>{
 }
 
 //     MARK: - Card
-//     card structure that contains and ID and the card value. cardContent can be added later if we want to add an image.
 struct Card: Identifiable {
     var id: Int
     var value: Int
