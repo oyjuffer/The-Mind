@@ -23,7 +23,7 @@ struct TM_Model<cardContent>{
     var activateView: Bool = true
     
     // game
-    var level: Int = 6  // would update +1 on win
+    var level: Int = 1  // would update +1 on win
     var life: Int = 3
     var lifeLost = false
     var shurikens = 1

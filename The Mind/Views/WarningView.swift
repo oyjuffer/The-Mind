@@ -28,6 +28,7 @@ struct WarningView: View {
                     .cornerRadius(10)
                 Button("Main Menu") {
                     game.menu()
+                    game.reset()
                 }
                     .padding()
                     .background(Color(#colorLiteral(red: 0.1205435768, green: 0.2792448401, blue: 0.4109080434, alpha: 1)))
