@@ -12,92 +12,203 @@ struct GameView: View {
     
     @State private var cardOffset: CGSize = .zero
     @State private var showCard: Bool = false
-    
-    @State var bots = 3
-    var bot = ["😃", "😎", "😴"]
+    @State private var showPopUp: Bool = false
+    @State private var isMenuOpen: Bool = false
     
     var body: some View {
-        
         ZStack{
-            backgroundView()
-            
-            VStack {
+            ZStack(){
+                backgroundView()
                 
-                //reset button
-                HStack(){
+                VStack {
                     
-                    Spacer()
-                    
-                    ZStack{
-                        RoundedRectangle(cornerRadius: 20)
-                            .stroke(.red, lineWidth: 3)
-                            .aspectRatio(1, contentMode: .fit)
-                            .frame(width: /*@START_MENU_TOKEN@*/25.0/*@END_MENU_TOKEN@*/, height: /*@START_MENU_TOKEN@*/25.0/*@END_MENU_TOKEN@*/)
+                    //reset button
+                    HStack(){
+                        Spacer()
+                        Text("Level \(game.level)")
+                            .font(.system(size: 30))
+                        Spacer()
                         
-                        Button {
-                            game.reset()
-                        } label: {
-                            Text("X")
-                        }
-                    }
-                    
-                }
-                
-                // bot view
-                LazyVGrid(columns: [GridItem(), GridItem(), GridItem()]) {
-                    ForEach(bot[0..<bots], id: \.self){ bot in
-                        botView(content: bot)
-                            .aspectRatio(1/0.8, contentMode: .fit)
-                    }
-                }
-                
-                // Displays the game board.
-                boardView(card: game.boardCard)
-                
-                // player view
-                HStack(){
-                    LazyVGrid(columns: [GridItem(
-                        .adaptive(minimum:80), spacing: -50)]){
-                            ForEach(game.playerHand.suffix(6)) { card in
-                                cardView(cardName: card.filename)
-                                    .aspectRatio(0.2, contentMode: .fill)
-                                    .onTapGesture {
-                                        withAnimation {
-                                            cardOffset = geometry(for: card)
-                                            showCard = true
-                                            game.playCard()
-                                        }
+                        
+                        ZStack{
+                            Menu(content: {
+                                // Menu items
+                                Button(action: {
+                                    if (game.activeBots){
+                                        // Pause the game
+                                        game.pause()
+                                    } else {
+                                        game.resume()
                                     }
-                            }
+                                    
+                                }, label: {
+                                    if (game.activeBots){
+                                        // Pause the game
+                                        Text("Pause Game")
+                                    } else {
+                                        Text("Resume Game")
+                                    }
+                                        
+                                    })
+                                Button(action: {
+                                    // Go back to main menu
+                                    game.pause()
+                                    game.toggleWarning()
+                                }, label: {
+                                        Text("Main Menu")
+                                    })
+                            }, label: {
+                                Button(action: {
+                                    isMenuOpen.toggle()
+                                }, label: {
+                                    Image(systemName: "list.dash")
+                                        .frame(width: /*@START_MENU_TOKEN@*/25.0/*@END_MENU_TOKEN@*/, height: /*@START_MENU_TOKEN@*/25.0/*@END_MENU_TOKEN@*/)
+                                        .font(.system(size: 24, weight: .bold))
+                                        .foregroundColor(.black)
+                                })
+                            })
                         }
-                        .frame(width: /*@START_MENU_TOKEN@*/270.0/*@END_MENU_TOKEN@*/, height: /*@START_MENU_TOKEN@*/100.0/*@END_MENU_TOKEN@*/)
-                    
-                    Spacer()
-                    
-                    // joker and play card buttons
-                    VStack{
                         
-                        ZStack{
-                            Image("star")
-                                .resizable()
-                                .aspectRatio(1,contentMode: .fit)
-                        }
-                        
-                        ZStack{
-                            if syncPressed == true {
-                                playButton()
-                            }
-                            else {
-                                syncButton()
-                            }
+                    }
+                    
+                    // bot view
+                    LazyVGrid(columns: [GridItem(), GridItem(), GridItem()]) {
+                        ForEach(game.bots, id: \.id) { bot in
+                            botView(content: bot.hand.count)
+                                .aspectRatio(1/0.8, contentMode: .fit)
                         }
                     }
+                    // board view
+                    boardView(card: game.boardCard)
+
+                    // player view
+                    HStack(){
+                        // joker and play card buttons
+                        VStack{
+                            
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 20)
+                                    .fill(Color.clear)
+                                    .frame(width: 70, height: 70)
+                                    
+                                
+                                Image("star")
+                                    .resizable()
+                                    .aspectRatio(1,contentMode: .fit)
+                                    
+                                
+                                VStack {
+                                    Spacer()
+                                    
+                                    HStack {
+                                        Spacer()
+                                        
+                                        ZStack {
+                                            Rectangle()
+                                                .fill(Color(#colorLiteral(red: 0.1205435768, green: 0.2792448401, blue: 0.4109080434, alpha: 1)))
+                                                .frame(width: 30, height: 30)
+                                                .cornerRadius(5)
+                                            
+                                            Text("\(game.shuriken)")
+                                                .foregroundColor(.white)
+                                                .font(.system(size: 14))
+                                        }
+                                        .offset(x: 10, y: -10)
+                                    }
+                                }
+                            }
+                            
+                            ZStack{
+                                RoundedRectangle(cornerRadius: 20)
+                                    .fill(Color.clear)
+                                    .frame(width: 70, height: 70)
+                                    
+                                
+                                Image("mascot")
+                                    .resizable()
+                                    .aspectRatio(1,contentMode: .fit)
+                                    
+                                
+                                VStack {
+                                    Spacer()
+                                    
+                                    HStack {
+                                        Spacer()
+                                        
+                                        ZStack {
+                                            Rectangle()
+//                                                .fill(Color(#colorLiteral(red: 0.1205435768, green: 0.2792448401, blue: 0.4109080434, alpha: 1)))
+                                                .fill(Color(#colorLiteral(red: 0.97, green: 0.94, blue: 0.89, alpha: 1)))
+                                                .frame(width: 30, height: 30)
+                                                .cornerRadius(5)
+                                            
+                                            Text("\(game.life)")
+//                                                .foregroundColor(.white)
+                                                .foregroundColor(.black)
+                                                .font(.system(size: 14))
+                                        }
+                                        .offset(x: 10, y: -10)
+                                    }
+                                }
+                            }
+                            Spacer()
+                            
+                            
+                            
+
+                            
+//                            ZStack{
+//                                if syncPressed == true {
+//                                    playButton()
+//                                }
+//                                else {
+//                                    syncButton()
+//                                }
+//                            }
+                        }
+                        
+                        Spacer()
+                        
+                        LazyVGrid(columns: [GridItem(
+                            .adaptive(minimum:80), spacing: -50, alignment: .trailing)], alignment: .trailing){
+                                ForEach(game.playerHand.suffix(5)) { card in
+                                    cardView(cardName: card.filename)
+                                        .aspectRatio(0.2, contentMode: .fill)
+                                        .onTapGesture {
+                                            withAnimation {
+                                                cardOffset = geometry(for: card)
+                                                showCard = true
+                                                game.playCard()
+                                            }
+                                        }
+                                }
+                            }
+                            .padding(.leading, CGFloat(40))
+//                            .padding(.leading, UIScreen.main.bounds.width - CGFloat(40))
+                            .frame(width: /*@START_MENU_TOKEN@*/270.0/*@END_MENU_TOKEN@*/, height: /*@START_MENU_TOKEN@*/100.0/*@END_MENU_TOKEN@*/)
+                        
+                    } .allowsHitTesting(game.activateView)
+                }
+                .padding(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
+                
+                
+            }
+            if game.popupWin {
+                VStack {
+                    LevelUpView(game: game)
+                }
+            } else if game.popupLost {
+                VStack {
+                    LoseLifeView(game: game)
+                }
+            } else if game.popupMenu {
+                VStack {
+                    WarningView(game: game)
                 }
             }
-            .padding(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)}
-        
-        
+        }
     }
+    
     
     func geometry(for card: Card) -> CGSize {
         guard let index = game.playerHand.firstIndex(where: { $0.id == card.id}) else {
@@ -209,7 +320,7 @@ struct boardView: View {
             
             if card.value != 0 {
                 cardView(cardName: card.filename)
-                    .frame(width: 80.0, height: 100.0)
+                    .frame(width: 80.0, height: 300.0)
                     .offset(cardOffset)
                     .gesture(
                         DragGesture()
@@ -228,16 +339,40 @@ struct boardView: View {
 }
 // generates bot frames
 struct botView: View {
-    var content: String
+    var content: Int
     
     var body: some View {
-        ZStack{
-            RoundedRectangle(cornerRadius: 10)
+        ZStack {
+            Circle()
                 .fill(Color(#colorLiteral(red: 0.97, green: 0.94, blue: 0.89, alpha: 1)))
-
+                .frame(width: 110, height: 110)
+            
             Image("happy")
                 .resizable()
-                .frame(width: 70.0, height: 70.0)
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 80, height: 80)
+                .clipShape(Circle())
+                
+            
+            VStack {
+                Spacer()
+                
+                HStack {
+                    Spacer()
+                    
+                    ZStack {
+                        Rectangle()
+                            .fill(Color(#colorLiteral(red: 0.1205435768, green: 0.2792448401, blue: 0.4109080434, alpha: 1)))
+                            .frame(width: 30, height: 30)
+                            .cornerRadius(5)
+                        
+                        Text("\(content)")
+                            .foregroundColor(.white)
+                            .font(.system(size: 14))
+                    }
+                    .offset(x: 10, y: -10)
+                }
+            }
         }
     }
 }

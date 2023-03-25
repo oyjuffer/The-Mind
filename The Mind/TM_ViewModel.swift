@@ -41,6 +41,34 @@ class TM_ViewModel: ObservableObject{
         return model.life
     }
     
+    var popupWin: Bool{
+        return model.showPopupWin
+    }
+    
+    var popupLost: Bool{
+        return model.showPopupLost
+    }
+    
+    var popupMenu: Bool{
+        return model.showPopupMenu
+    }
+    
+    var activateView: Bool{
+        return model.activateView
+    }
+    
+    var bots: Array<Bot>{
+        return model.bots
+    }
+    
+    var activeBots: Bool{
+        return model.botsActive
+    }
+    
+    var shuriken: Int{
+        return model.shurikens
+    }
+    
     
     // MARK: - MENU CONTROLS
     func play(){
@@ -50,6 +78,19 @@ class TM_ViewModel: ObservableObject{
     
     func instructions(){
         model.instructions()
+    }
+    
+    func menu(){
+        model.mainMenu()
+    }
+    
+    func pause(){
+        model.botsActive = false
+        model.activateView.toggle()
+    }
+    
+    func toggleWarning(){
+        model.showPopupMenu.toggle()
     }
     
     func reset(){
@@ -69,5 +110,16 @@ class TM_ViewModel: ObservableObject{
         looper()
         model.gameState = 2
         model.botsActive = true
+        model.activateView.toggle()
+    }
+    
+    func closePopup(){
+        if model.showPopupWin{
+            model.showPopupWin.toggle()
+        } else if model.showPopupLost{
+            model.showPopupLost.toggle()
+        } else {
+            model.showPopupMenu.toggle()
+        }
     }
 }

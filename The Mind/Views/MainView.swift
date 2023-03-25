@@ -30,18 +30,18 @@ struct MainView: View {
         else if game.gameState == 3{
             InstructionsView(game: game)
         }
-        else if game.gameState == 4{
-            LevelUpView(game: game)
-        }
-        else if game.gameState == 5{
-            LoseLifeView(game: game)
-        }
-        else if game.gameState == 6{
-            GameWonView(game: game)
-        }
-        else if game.gameState == 7{
-            GameOverView(game: game)
-        }
+//        else if game.gameState == 4{
+//            LevelUpView(game: game)
+//        }
+//        else if game.gameState == 5{
+//            LoseLifeView(game: game)
+//        }
+//        else if game.gameState == 6{
+//            GameWonView(game: game)
+//        }
+//        else if game.gameState == 7{
+//            GameOverView(game: game)
+//        }
     }
 }
 

@@ -17,9 +17,13 @@ struct TM_Model<cardContent>{
     // 8 = Play Shuriken
     
     var resumeGame: Bool = true
+    var showPopupWin: Bool = false
+    var showPopupLost: Bool = false
+    var showPopupMenu: Bool = false
+    var activateView: Bool = true
     
     // game
-    var level: Int = 1  // would update +1 on win
+    var level: Int = 6  // would update +1 on win
     var life: Int = 3
     var lifeLost = false
     var shurikens = 1
@@ -134,7 +138,8 @@ struct TM_Model<cardContent>{
                 botsActive = false
             }else{
                 levelUp()
-                gameState = 4
+                activateView = false
+                showPopupWin = true
                 botsActive = false
             }
         }
@@ -153,7 +158,9 @@ struct TM_Model<cardContent>{
                 lifeLost = true
                 generateChunks(bias: true)
                 gameChange = true
-                gameState = 5
+                //popup
+                activateView = false
+                showPopupLost = true
                 botsActive = false
             }
         } else if(shurikens > 0 && bots.allSatisfy{$0.shuriken} && playerShuriken){
@@ -283,6 +290,11 @@ struct TM_Model<cardContent>{
     
     mutating func instructions(){
         gameState = 3
+    }
+    
+    mutating func mainMenu(){
+        gameState = 1
+        botsActive = false
     }
     
     // restarts the game at level 1 when the cross is clicked.
