@@ -2,7 +2,7 @@
 //  GameOverView.swift
 //  The Mind
 //
-//  Created by O.Y. Juffer on 24/03/2023.
+//  Created by Ioana - Andreea Cojocaru on 3/25/23.
 //
 
 import SwiftUI
@@ -11,33 +11,25 @@ struct GameOverView: View {
     @ObservedObject var game: TM_ViewModel
 
     var body: some View {
-        ZStack {
-            Image("background")
-                .resizable()
-                .scaledToFill()
-                .edgesIgnoringSafeArea(.all)
-                .opacity(0.8)
-//            Color.black.opacity(0.4) // Semi-transparent black background
-//                .edgesIgnoringSafeArea(.all)
-                    
             VStack {
                 Text("Game Over!") // Display the message
                     .font(.title)
                     .fontWeight(.bold)
-                Text("Congratulations, you super suck!")
-                        
-                Button("Return") { // Button to dismiss the popup
-                    game.reset()// Perform the action when the user taps the button
+                Text("You reached level \(game.level)")
+                Text("Play time: ")
+                    
+                Button("Back to menu") {
+                    game.menu()
                 }
                     .padding()
-                    .background(Color.blue)
+                    .background(Color(#colorLiteral(red: 0.1205435768, green: 0.2792448401, blue: 0.4109080434, alpha: 1)))
                     .foregroundColor(.white)
                     .cornerRadius(10)
                 }
                 .padding()
-                .background(Color.white)
+                .background(Color(#colorLiteral(red: 0.97, green: 0.94, blue: 0.89, alpha: 1)))
                 .cornerRadius(20)
                 .shadow(radius: 20)
+                .frame(width: 350, height: 200)
             }
     }
-}

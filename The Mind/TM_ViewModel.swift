@@ -53,6 +53,10 @@ class TM_ViewModel: ObservableObject{
         return model.showPopupMenu
     }
     
+    var popupOver: Bool{
+        return model.showPopupOver
+    }
+    
     var activateView: Bool{
         return model.activateView
     }
@@ -68,6 +72,23 @@ class TM_ViewModel: ObservableObject{
     var shuriken: Int{
         return model.shurikens
     }
+    
+    var botPlays: Bool{
+        return model.botPlays
+    }
+    
+    var shurikenActivated: Bool{
+        return model.shurikenActivated
+    }
+    
+    var cardToPlay: Card{
+        return model.cardToPlay
+    }
+    
+    var botsPlaying: Array<Bool>{
+        return model.botsPlaying
+    }
+    
     
     
     // MARK: - MENU CONTROLS
@@ -91,6 +112,25 @@ class TM_ViewModel: ObservableObject{
     
     func toggleWarning(){
         model.showPopupMenu.toggle()
+    }
+    
+    func toggleShuriken(){
+        model.shurikenActivated.toggle()
+    }
+    
+    func toggleBotPlays(){
+        if model.botPlays{
+            model.botPlays = false
+            print(model.botPlays)
+        }
+    }
+    
+    func toggleBotsPlaying(id: Int){
+        model.botsPlaying[id] = false
+    }
+    
+    func setBoardCard(card: Card){
+        model.boardCard = card
     }
     
     func reset(){
@@ -118,8 +158,11 @@ class TM_ViewModel: ObservableObject{
             model.showPopupWin.toggle()
         } else if model.showPopupLost{
             model.showPopupLost.toggle()
-        } else {
+        } else if model.showPopupMenu{
             model.showPopupMenu.toggle()
+        } else {
+            model.showPopupOver.toggle()
         }
     }
+    
 }

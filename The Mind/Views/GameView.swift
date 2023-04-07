@@ -15,6 +15,8 @@ struct GameView: View {
     @State private var showPopUp: Bool = false
     @State private var isMenuOpen: Bool = false
     
+    @Namespace private var animation
+    
     var body: some View {
         ZStack{
             ZStack(){
@@ -74,12 +76,108 @@ struct GameView: View {
                     // bot view
                     LazyVGrid(columns: [GridItem(), GridItem(), GridItem()]) {
                         ForEach(game.bots, id: \.id) { bot in
-                            botView(content: bot.hand.count)
+                            
+                            BotView(content: bot.hand.count, card: game.boardCard, bot: bot, namespace: animation, game: game)
                                 .aspectRatio(1/0.8, contentMode: .fit)
                         }
                     }
+                    
+                    // joker show cards of bots
+                    if (game.shurikenActivated){
+                        LazyVGrid(columns: [GridItem(), GridItem(), GridItem()]) {
+                            ForEach(game.bots, id: \.id) { bot in
+                                if let lastCard = bot.hand.last{
+                                    CardView(cardName: lastCard.filename, namespace: animation, cardHeight: 120)
+                                        .aspectRatio(1/2, contentMode: .fit)
+                                }
+                            }
+                        }
+                    }
+//                    else if (game.botPlays){
+                        
+//                        CardView(cardName: "\(game.boardCard)", namespace: animation, cardHeight: 120)
+//                            .animation(.spring())
+//                            .onAppear {
+//                                withAnimation {
+//                                    cardOffset = geometry(for: game.boardCard)
+//                                    showCard = true
+//                                }
+//                            }
+//                    }
+//                        ForEach(game.bots, id: \.id) { bot in
+//                            for botCard in model.botsPlaying {
+//                                if botCard.1 == true {
+//                                    LazyVGrid(columns: [GridItem(.flexible())]) {
+//                                        if let lastCard = bot.hand.last{
+//                                            CardView(cardName: lastCard.filename, namespace: animation, cardHeight: 80)
+//                                                .aspectRatio(1/2, contentMode: .fit)
+//                                                .onChange(of: bot.play) { _ in
+//                                                    withAnimation {
+//                                                        cardOffset = geometry(for: lastCard)
+//                                                        showCard = true
+//                                                    }
+//                                                }
+//                                        }
+//                                    }
+//                                }
+//                                botCard.1 = false
+//                            }
+//                        }
+                            
+                            
+                            
+//                            if bot.play.wrappedValue {
+//                                let botID = bot.id
+//                                LazyVGrid(columns: [GridItem(.flexible())]) {
+//                                    if let lastCard = bot.hand.last{
+//                                        CardView(cardName: lastCard.filename, namespace: animation, cardHeight: 80)
+//                                            .aspectRatio(1/2, contentMode: .fit)
+//                                            .onChange(of: bot.play) { _ in
+//                                                withAnimation {
+//                                                    cardOffset = geometry(for: lastCard)
+//                                                    showCard = true
+//                                                }
+//                                            }
+//                                    }
+//                                }
+//                            }
+//
+//                            bot.play.wrappedValue = false
+//                                    }
+//                        game.toggleBotPlays()
+                        // go through the array of boots
+                        // if it wants to play, keep the id of the bot and add animation
+                        // in the end take the same id and turn variable to false
+//                        ForEach(game.bots, id: \.id) { bot in
+//                            if bot.play = true {
+//
+//                                bot.play = false
+//                            }
+//                        }
+//                    }
+                    
+                    
+                    
+                    
+//                    withAnimation {
+//                        cardOffset = geometry(for: card)
+//                        showCard = true
+//                        game.playCard()
+//                    }
+                    
+                    else {
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(Color.clear)
+                            .frame(height: 120)
+                    }
+                    
                     // board view
-                    boardView(card: game.boardCard)
+//                    boardView(card: game.boardCard, namespace: animation, botPlays: game.botPlays)
+                    boardView(card: game.boardCard, namespace: animation, game: game)
+//                    if (game.botPlays) {
+//                    game.toggleBotPlays()
+//                    }
+
 
                     // player view
                     HStack(){
@@ -103,17 +201,21 @@ struct GameView: View {
                                     HStack {
                                         Spacer()
                                         
-                                        ZStack {
-                                            Rectangle()
-                                                .fill(Color(#colorLiteral(red: 0.1205435768, green: 0.2792448401, blue: 0.4109080434, alpha: 1)))
-                                                .frame(width: 30, height: 30)
-                                                .cornerRadius(5)
-                                            
-                                            Text("\(game.shuriken)")
-                                                .foregroundColor(.white)
-                                                .font(.system(size: 14))
+                                        Button(action: {
+                                            game.toggleShuriken()
+                                        }) {
+                                            ZStack {
+                                                Rectangle()
+                                                    .fill(Color(#colorLiteral(red: 0.1205435768, green: 0.2792448401, blue: 0.4109080434, alpha: 1)))
+                                                    .frame(width: 30, height: 30)
+                                                    .cornerRadius(5)
+                                                
+                                                Text("\(game.shuriken)")
+                                                    .foregroundColor(.white)
+                                                    .font(.system(size: 14))
+                                            }
+                                            .offset(x: 10, y: -10)
                                         }
-                                        .offset(x: 10, y: -10)
                                     }
                                 }
                             }
@@ -152,19 +254,6 @@ struct GameView: View {
                                 }
                             }
                             Spacer()
-                            
-                            
-                            
-
-                            
-//                            ZStack{
-//                                if syncPressed == true {
-//                                    playButton()
-//                                }
-//                                else {
-//                                    syncButton()
-//                                }
-//                            }
                         }
                         
                         Spacer()
@@ -172,13 +261,14 @@ struct GameView: View {
                         LazyVGrid(columns: [GridItem(
                             .adaptive(minimum:80), spacing: -50, alignment: .trailing)], alignment: .trailing){
                                 ForEach(game.playerHand.suffix(5)) { card in
-                                    cardView(cardName: card.filename)
+                                    CardView(cardName: card.filename, namespace: animation, cardHeight: 120)
                                         .aspectRatio(0.2, contentMode: .fill)
                                         .onTapGesture {
                                             withAnimation {
                                                 cardOffset = geometry(for: card)
                                                 showCard = true
                                                 game.playCard()
+                                                game.setBoardCard(card: game.cardToPlay)
                                             }
                                         }
                                 }
@@ -204,6 +294,10 @@ struct GameView: View {
             } else if game.popupMenu {
                 VStack {
                     WarningView(game: game)
+                }
+            } else if game.popupOver {
+                VStack {
+                    GameOverView(game: game)
                 }
             }
         }
@@ -232,147 +326,58 @@ struct backgroundView: View {
     }
 }
 
-struct syncButton: View {
-    @GestureState var tap = false
-    @State var press = false
-    
-    var body: some View {
-        ZStack{
-            Text("Sync")
-                .opacity(press ? 0 : 1)
-                .scaleEffect(press ? 0 : 1)
-            
-            Text("Play2")
-                .opacity(press ? 1 : 0)
-                .scaleEffect(press ? 1 : 0)
-        }
-        .frame(width: 70, height: 70)
-        .background(
-            ZStack {
-                LinearGradient(gradient: Gradient(colors: [Color(press ? #colorLiteral(red: 0.9229335189, green: 0.9617477059, blue: 0.995072186, alpha: 1) : #colorLiteral(red: 0.9229335189, green: 0.9617477059, blue: 0.995072186, alpha: 1) )]), startPoint: .topLeading, endPoint: .bottomTrailing)
-                Circle()
-                    .stroke(Color.clear, lineWidth: 10)
-                    .shadow(color: Color(press ? #colorLiteral(red: 0.9229335189, green: 0.9617477059, blue: 0.995072186, alpha: 1) : #colorLiteral(red: 0.9229335189, green: 0.9617477059, blue: 0.995072186, alpha: 1) ), radius: 3, x: 3, y: 3)
-            }
-        )
-        .clipShape(Circle())
-        .overlay(
-            Circle()
-                .trim(from: tap ? 0.001 : 1, to: 1)
-                .stroke(Color(press ? #colorLiteral(red: 0.9229335189, green: 0.9617477059, blue: 0.995072186, alpha: 1) : #colorLiteral(red: 0.3847309053, green: 0.6923297048, blue: 0.9472768903, alpha: 1)), style:  StrokeStyle(lineWidth: 5, lineCap: .round))
-                .frame(width: 65, height: 65)
-                .rotationEffect(Angle(degrees: 90))
-                .rotation3DEffect(Angle(degrees: 180), axis: (x: 1, y: 0, z: 0))
-                .animation(Animation.easeInOut)
-        )
-        .scaleEffect(tap ? 1.2 : 1)
-        .gesture(LongPressGesture().updating($tap) {currentState, gestureState, transaction in
-            gestureState = currentState
-        }
-            .onEnded{value in self.press.toggle()
-                syncPressed = false
-            }
-        )
-    }
-}
-
-struct playButton: View {
-    @GestureState var tap = false
-    @State var press = false
-    
-    var body: some View {
-        ZStack{
-            Text("Play")
-        }
-        .frame(width: 70, height: 70)
-        .background(
-            ZStack {
-                LinearGradient(gradient: Gradient(colors: [Color(press ? #colorLiteral(red: 0.9229335189, green: 0.9617477059, blue: 0.995072186, alpha: 1) : #colorLiteral(red: 0.9229335189, green: 0.9617477059, blue: 0.995072186, alpha: 1) )]), startPoint: .topLeading, endPoint: .bottomTrailing)
-                Circle()
-                    .stroke(Color.clear, lineWidth: 10)
-                    .shadow(color: Color(press ? #colorLiteral(red: 0.9229335189, green: 0.9617477059, blue: 0.995072186, alpha: 1) : #colorLiteral(red: 0.9229335189, green: 0.9617477059, blue: 0.995072186, alpha: 1) ), radius: 3, x: 3, y: 3)
-            }
-        )
-        .clipShape(Circle())
-        .scaleEffect(tap ? 1.1 : 1)
-    }
-}
-
-struct cardView: View {
-    var cardName: String
-    var body: some View {
-        Image(cardName)
-            .resizable()
-            .aspectRatio(2/3, contentMode: .fit)
-    }
-}
 
 // generates the board
 struct boardView: View {
     var card: Card
     @State private var cardOffset: CGSize = .zero
+    let namespace: Namespace.ID
+    @ObservedObject var game: TM_ViewModel
+//    var botPlays: Bool
     
     var body: some View {
         ZStack{
             RoundedRectangle(cornerRadius: 20)
                 .stroke(lineWidth: 3)
-                .frame(height: 300)
+                .frame(height: 200)
             
             if card.value != 0 {
-                cardView(cardName: card.filename)
-                    .frame(width: 80.0, height: 300.0)
-                    .offset(cardOffset)
-                    .gesture(
-                        DragGesture()
-                            .onChanged { gesture in
-                                cardOffset = gesture.translation
-                            }
-                            .onEnded { _ in
-                                withAnimation {
-                                    cardOffset = .zero
-                                }
-                            }
-                    )
-            }
-        }
-    }
-}
-// generates bot frames
-struct botView: View {
-    var content: Int
-    
-    var body: some View {
-        ZStack {
-            Circle()
-                .fill(Color(#colorLiteral(red: 0.97, green: 0.94, blue: 0.89, alpha: 1)))
-                .frame(width: 110, height: 110)
-            
-            Image("happy")
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 80, height: 80)
-                .clipShape(Circle())
-                
-            
-            VStack {
-                Spacer()
-                
-                HStack {
-                    Spacer()
+//                if game.botPlays {
+//                    CardView(cardName: card.filename, namespace: namespace, cardHeight: 120)
+//                        .frame(width: 80.0, height: 200.0)
+//                        .offset(y: 10)
+//                        .animation(.spring())
+//                        .onAppear {
+//
+//                            withAnimation {
+//                                cardOffset = .zero
+//                                game.toggleBotPlays()
+//                            }
+//                        }
+//
+//                }
+//
+//                else {
                     
-                    ZStack {
-                        Rectangle()
-                            .fill(Color(#colorLiteral(red: 0.1205435768, green: 0.2792448401, blue: 0.4109080434, alpha: 1)))
-                            .frame(width: 30, height: 30)
-                            .cornerRadius(5)
-                        
-                        Text("\(content)")
-                            .foregroundColor(.white)
-                            .font(.system(size: 14))
-                    }
-                    .offset(x: 10, y: -10)
-                }
+                    CardView(cardName: card.filename, namespace: namespace, cardHeight: 120)
+                        .frame(width: 80.0, height: 200.0)
+                        .offset(cardOffset)
+                        .gesture(
+                            DragGesture()
+                                .onChanged { gesture in
+                                    cardOffset = gesture.translation
+                                }
+                                .onEnded { _ in
+                                    withAnimation {
+                                        cardOffset = .zero
+                                        game.setBoardCard(card: game.cardToPlay)
+//                                        game.boardCard = game.cardToPlay
+                                    }
+                                }
+                        )
+//                }
             }
         }
     }
 }
+

@@ -20,13 +20,15 @@ struct TM_Model<cardContent>{
     var showPopupWin: Bool = false
     var showPopupLost: Bool = false
     var showPopupMenu: Bool = false
+    var showPopupOver: Bool = false
     var activateView: Bool = true
     
     // game
-    var level: Int = 1  // would update +1 on win
+    var level: Int = 6  // would update +1 on win
     var life: Int = 3
     var lifeLost = false
     var shurikens = 1
+    var shurikenActivated = false
     
     var deck: Array<Card>
     var boardCard: Card = Card(id: 0, value: 0)
@@ -44,6 +46,9 @@ struct TM_Model<cardContent>{
     var bots: Array<Bot>
     var botsActive = false
     var nBots = 3
+    var botPlays: Bool = false
+    var cardToPlay: Card = Card(id: 0, value: 0)
+    var botsPlaying: Array<Bool> = [false, false, false]
     
     // bot model
     var trial: Int = 0
@@ -117,6 +122,14 @@ struct TM_Model<cardContent>{
                 
                 if !bots[i].hand.isEmpty && (bots[i].estimate <= gameTime || emptyHand(id: bots[i].id) == true){
                     print("BOT \(bots[i].id) PLAYING CARD: \(bots[i].hand.last!.value)")
+//                    let botid = bots[i].id
+                    
+//                    for botCard in botPlaysCard {
+//                        if botCard.0 == botid {
+//                            botCard.1 = true
+//                        }
+//                    }
+                    botsPlaying[i] = true
                     bots[i].hand = playCard(hand: bots[i].hand)
                     break
                 }
@@ -150,7 +163,8 @@ struct TM_Model<cardContent>{
             
             // game over
             if life <= 1{
-                gameState = 7
+                showPopupOver = true
+//                gameState = 7
                 botsActive = false
             }else{
                 removeCards()
@@ -308,13 +322,30 @@ struct TM_Model<cardContent>{
         var hand = hand
         
         if (hand.count != 0){
+            botPlays = true
             boardCardPrevious = boardCard
-            boardCard = hand.removeLast()
+//            boardCard = hand.removeLast()
+            cardToPlay = hand.removeLast()
         }
         
         gameChange = true
         return hand
     }
+    //    !!!!!!!!!!!!!! STILL NEED TO IMPLEMENT
+    // plays lowest cards from bot and player when joker is used
+//    mutating func playJoker(hand: Array<Card>) -> Array<Card>{
+//        var hand = hand
+//
+//        if (hand.count != 0){
+//            botPlays = true
+//            boardCardPrevious = boardCard
+//            boardCard = hand.removeLast()
+////            cardToPlay = hand.removeLast()
+//        }
+//
+//        gameChange = true
+//        return hand
+//    }
     
     // checks if a bot should empty their hand because they are the last left with cards
     mutating func emptyHand(id: Int) -> Bool{
@@ -344,7 +375,7 @@ struct Card: Identifiable {
 }
 
 // MARK: - Bot
-struct Bot {
+struct Bot: Identifiable {
     var id: Int
     var model = Model()
     var hand: Array<Card>
