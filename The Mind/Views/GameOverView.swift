@@ -19,6 +19,7 @@ struct GameOverView: View {
                 Text("Play time: ")
                     
                 Button("Back to menu") {
+                    game.reset()
                     game.menu()
                 }
                     .padding()

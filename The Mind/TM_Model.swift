@@ -24,7 +24,7 @@ struct TM_Model<cardContent>{
     var activateView: Bool = true
     
     // game
-    var level: Int = 6  // would update +1 on win
+    var level: Int = 1  // would update +1 on win
     var life: Int = 3
     var lifeLost = false
     var shurikens = 1
@@ -47,7 +47,6 @@ struct TM_Model<cardContent>{
     var botsActive = false
     var nBots = 3
     var botPlays: Bool = false
-    var cardToPlay: Card = Card(id: 0, value: 0)
     var botsPlaying: Array<Bool> = [false, false, false]
     
     // bot model
@@ -108,7 +107,7 @@ struct TM_Model<cardContent>{
             }
             
             // sort according to lowest estimate first, meaning the bot[0] plays first
-            bots = bots.sorted{$0.estimate < $1.estimate}
+//            bots = bots.sorted{$0.estimate < $1.estimate}
             shortestEstimatePrevious = shortestEstimate
             shortestEstimate = bots.min{$0.estimate < $1.estimate}!.estimate
             
@@ -122,13 +121,6 @@ struct TM_Model<cardContent>{
                 
                 if !bots[i].hand.isEmpty && (bots[i].estimate <= gameTime || emptyHand(id: bots[i].id) == true){
                     print("BOT \(bots[i].id) PLAYING CARD: \(bots[i].hand.last!.value)")
-//                    let botid = bots[i].id
-                    
-//                    for botCard in botPlaysCard {
-//                        if botCard.0 == botid {
-//                            botCard.1 = true
-//                        }
-//                    }
                     botsPlaying[i] = true
                     bots[i].hand = playCard(hand: bots[i].hand)
                     break
@@ -179,7 +171,6 @@ struct TM_Model<cardContent>{
             }
         } else if(shurikens > 0 && bots.allSatisfy{$0.shuriken} && playerShuriken){
             shurikens -= 1
-            print("SHOW CARDS")
             // set the first card in the hands to reveal.
             if !playerHand.isEmpty{playerHand[playerHand.count - 1].reveal = true}
             for i in 0..<bots.count where !bots[i].hand.isEmpty{bots[i].hand[bots[i].hand.count - 1].reveal = true}
@@ -293,7 +284,6 @@ struct TM_Model<cardContent>{
         gameTimePrevious = gameTime
     }
     
-    
     // MARK: - GAME CONTROL
     
     // starts the game on the main menu.
@@ -324,8 +314,8 @@ struct TM_Model<cardContent>{
         if (hand.count != 0){
             botPlays = true
             boardCardPrevious = boardCard
-//            boardCard = hand.removeLast()
-            cardToPlay = hand.removeLast()
+            boardCard = hand.removeLast()
+            boardCard.played = true
         }
         
         gameChange = true
@@ -370,6 +360,7 @@ struct TM_Model<cardContent>{
 struct Card: Identifiable {
     var id: Int
     var value: Int
+    var played = false
     var reveal = false
     var filename: String {return "\(value)"}
 }

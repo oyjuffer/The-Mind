@@ -81,16 +81,14 @@ class TM_ViewModel: ObservableObject{
         return model.shurikenActivated
     }
     
-    var cardToPlay: Card{
-        return model.cardToPlay
-    }
+//    var cardToPlay: Card{
+//        return model.cardToPlay
+//    }
     
     var botsPlaying: Array<Bool>{
         return model.botsPlaying
     }
-    
-    
-    
+        
     // MARK: - MENU CONTROLS
     func play(){
         model.play()

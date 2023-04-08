@@ -8,11 +8,12 @@
 import SwiftUI
 
 struct BotView: View {
+    @ObservedObject var game: TM_ViewModel
+    
     var content: Int
     var card: Card
     var bot: Bot
     let namespace: Namespace.ID
-    @ObservedObject var game: TM_ViewModel
     @State private var cardOffset: CGSize = .zero
 //    @State var wantsToPlay = false
     
@@ -54,24 +55,24 @@ struct BotView: View {
                 }
             }
             
-            VStack {
-                if game.botsPlaying[bot.id]{
-                    let _ = print(bot.id)
-                    CardView(cardName: "20", namespace: namespace, cardHeight: 80)
-                        .animation(.spring())
-                        .onAppear {
-                            withAnimation {
-                                cardOffset = geometry(for: game.boardCard)
-//                                game.playCard()
-                                game.setBoardCard(card: game.cardToPlay)
-
-//                                game.boardCard = game.cardToPlay
-                                game.toggleBotsPlaying(id: bot.id)
-                                game.toggleBotPlays()
-                            }
-                        }
-                }
-            }
+//            VStack {
+//                if game.botsPlaying[bot.id]{
+//                    let _ = print(bot.id)
+//                    CardView(cardName: "20", namespace: namespace, cardHeight: 80)
+//                        .animation(.spring())
+//                        .onAppear {
+//                            withAnimation {
+//                                cardOffset = geometry(for: game.boardCard)
+////                                game.playCard()
+//                                game.setBoardCard(card: game.cardToPlay)
+//
+////                                game.boardCard = game.cardToPlay
+//                                game.toggleBotsPlaying(id: bot.id)
+//                                game.toggleBotPlays()
+//                            }
+//                        }
+//                }
+//            }
 //            CardView(cardName: "\(card.value)", namespace: namespace, cardHeight: 80)
 //                .onChange(of: bot.play) { _ in
 //                    withAnimation {
