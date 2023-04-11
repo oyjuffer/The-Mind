@@ -282,13 +282,14 @@ struct boardView: View {
     let animation: Namespace.ID
     let namespace: Namespace.ID
     @ObservedObject var game: TM_ViewModel
-    //    var botPlays: Bool
     
     var body: some View {
         ZStack{
             RoundedRectangle(cornerRadius: 20)
-                .stroke(lineWidth: 3)
+                .fill(Color.clear)
+//                .stroke(lineWidth: 3)
                 .frame(height: 200)
+                
             
             if card.value != 0 {
                 
@@ -296,19 +297,6 @@ struct boardView: View {
                     .frame(width: 80.0, height: 200.0)
                     .offset(cardOffset)
                     .matchedGeometryEffect(id: card.id, in: animation)
-//                    .gesture(
-//                        DragGesture()
-//                            .onChanged { gesture in
-//                                cardOffset = gesture.translation
-//                            }
-//                            .onEnded { _ in
-//                                withAnimation {
-//                                    cardOffset = .zero
-//                                    //                                        game.setBoardCard(card: game.cardToPlay)
-//                                    //                                        game.boardCard = game.cardToPlay
-//                                }
-//                            }
-//                    )
             }
         }
     }

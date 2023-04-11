@@ -214,7 +214,7 @@ struct TM_Model<cardContent>{
             print("EXTRA LIFE")
         }
         
-        if level == 1 || level == 5 || level == 8 {
+        if level == 2 || level == 5 || level == 8 {
             shurikens += 1
             print("EXTRA SHURIKEN")
         }
@@ -317,7 +317,7 @@ struct TM_Model<cardContent>{
             botPlays = true
             boardCardPrevious = boardCard
             boardCard = hand.removeLast()
-            boardCard.played = true
+//            boardCard.played = true
         }
         
         gameChange = true
@@ -348,7 +348,7 @@ struct TM_Model<cardContent>{
         for card in cards{
             let newCard = Card(id: card, value: card, played: true, reveal: false)
             boardCard = newCard
-            boardCard.played = true
+//            boardCard.played = true
         }
         
         gameChange = true
