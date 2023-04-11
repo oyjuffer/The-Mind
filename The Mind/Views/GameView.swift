@@ -87,17 +87,34 @@ struct GameView: View {
                         LazyVGrid(columns: [GridItem(), GridItem(), GridItem()]) {
                             ForEach(game.bots, id: \.id) { bot in
                                 if let lastCard = bot.hand.last{
-                                    CardView(game: game, card: lastCard.filename)
+                                    CardView(game: game, card: lastCard.filename, cardHeight: 120)
                                         .aspectRatio(1/2, contentMode: .fit)
                                         .matchedGeometryEffect(id: lastCard.id, in: animation)
                                         .transition(AnyTransition.asymmetric(insertion: .opacity, removal: .opacity))
-                                } else{
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .fill(Color.clear)
-                                        .frame(height: 120)
                                 }
                             }
                         }
+                    }
+//                    else if game.botPlays {
+//                        //select one of the columns??
+//                        LazyVGrid(columns: [GridItem(), GridItem(), GridItem()]) {
+//                            for i in game.botsPlaying.count {
+//                                if game.botsPlaying[i] {
+//                                    CardView(game: game, card: "back_card", cardHeight: 70)
+//                                        .animation(.spring())
+//                                        .onAppear {
+//                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+//                                                game.toggleBotsPlaying(id: bot.id)
+//                                            }
+//                                        }
+//                                }
+//                            }
+//                        }
+//                    }
+                    else{
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(Color.clear)
+                            .frame(height: 120)
                     }
                     
                     boardView(card: game.boardCard, animation: animation, namespace: animation, game: game)
@@ -125,7 +142,15 @@ struct GameView: View {
                                         Spacer()
                                         
                                         Button(action: {
-                                            game.toggleShuriken()
+                                            if game.shuriken != 0 {
+                                                game.toggleShuriken()
+                                                game.pause()
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                                    game.playJoker()
+                                                    game.resume()
+                                                }
+                                                
+                                            }
                                         }) {
                                             ZStack {
                                                 Rectangle()
@@ -162,14 +187,14 @@ struct GameView: View {
                                         
                                         ZStack {
                                             Rectangle()
-                                            //                                                .fill(Color(#colorLiteral(red: 0.1205435768, green: 0.2792448401, blue: 0.4109080434, alpha: 1)))
-                                                .fill(Color(#colorLiteral(red: 0.97, green: 0.94, blue: 0.89, alpha: 1)))
+                                                .fill(Color(#colorLiteral(red: 0.1205435768, green: 0.2792448401, blue: 0.4109080434, alpha: 1)))
+//                                                .fill(Color(#colorLiteral(red: 0.97, green: 0.94, blue: 0.89, alpha: 1)))
                                                 .frame(width: 30, height: 30)
                                                 .cornerRadius(5)
                                             
                                             Text("\(game.life)")
-                                            //                                                .foregroundColor(.white)
-                                                .foregroundColor(.black)
+                                                .foregroundColor(.white)
+//                                                .foregroundColor(.black)
                                                 .font(.system(size: 14))
                                         }
                                         .offset(x: 10, y: -10)
@@ -184,7 +209,7 @@ struct GameView: View {
                         LazyVGrid(columns: [GridItem(
                             .adaptive(minimum:80), spacing: -50, alignment: .trailing)], alignment: .trailing){
                                 ForEach(game.playerHand.suffix(5)) { card in
-                                    CardView(game: game, card: card.filename)
+                                    CardView(game: game, card: card.filename, cardHeight: 120)
                                         .matchedGeometryEffect(id: card.id, in: animation)
                                         .aspectRatio(0.2, contentMode: .fill)
                                         .onTapGesture {
@@ -267,7 +292,7 @@ struct boardView: View {
             
             if card.value != 0 {
                 
-                CardView(game: game, card: card.filename)
+                CardView(game: game, card: card.filename, cardHeight: 120)
                     .frame(width: 80.0, height: 200.0)
                     .offset(cardOffset)
                     .matchedGeometryEffect(id: card.id, in: animation)

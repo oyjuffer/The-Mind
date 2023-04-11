@@ -122,6 +122,8 @@ struct TM_Model<cardContent>{
                 if !bots[i].hand.isEmpty && (bots[i].estimate <= gameTime || emptyHand(id: bots[i].id) == true){
                     print("BOT \(bots[i].id) PLAYING CARD: \(bots[i].hand.last!.value)")
                     botsPlaying[i] = true
+                    botPlays = true
+                    //wait a bit before playing for the animation
                     bots[i].hand = playCard(hand: bots[i].hand)
                     break
                 }
@@ -212,7 +214,7 @@ struct TM_Model<cardContent>{
             print("EXTRA LIFE")
         }
         
-        if level == 2 || level == 5 || level == 8 {
+        if level == 1 || level == 5 || level == 8 {
             shurikens += 1
             print("EXTRA SHURIKEN")
         }
@@ -321,21 +323,39 @@ struct TM_Model<cardContent>{
         gameChange = true
         return hand
     }
-    //    !!!!!!!!!!!!!! STILL NEED TO IMPLEMENT
+
     // plays lowest cards from bot and player when joker is used
-//    mutating func playJoker(hand: Array<Card>) -> Array<Card>{
-//        var hand = hand
-//
-//        if (hand.count != 0){
-//            botPlays = true
-//            boardCardPrevious = boardCard
-//            boardCard = hand.removeLast()
-////            cardToPlay = hand.removeLast()
-//        }
-//
-//        gameChange = true
-//        return hand
-//    }
+    mutating func playJoker(){
+        shurikens = shurikens - 1
+        var cards: [Int] = []
+        
+        if playerHand.count != 0 {
+            let lastCard = playerHand.last
+            cards.append(lastCard!.value)
+            playerHand.removeLast()
+        }
+        
+        for i in 0..<bots.count where bots[i].hand.count != 0 {
+            while bots[i].hand.count != 0 {
+                let lastCard = bots[i].hand.last
+                cards.append(lastCard!.value)
+                bots[i].hand.removeLast()
+            }
+        }
+        
+        cards.sort()
+        
+        for card in cards{
+            let newCard = Card(id: card, value: card, played: true, reveal: false)
+            boardCard = newCard
+            boardCard.played = true
+        }
+        
+        gameChange = true
+        
+        // toggle shuriken back
+        shurikenActivated = false
+    }
     
     // checks if a bot should empty their hand because they are the last left with cards
     mutating func emptyHand(id: Int) -> Bool{

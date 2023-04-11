@@ -10,6 +10,7 @@ import SwiftUI
 struct CardView: View {
     @ObservedObject var game: TM_ViewModel
     var card: String
+    var cardHeight: CGFloat
     
     var body: some View {
         ZStack{
@@ -17,7 +18,7 @@ struct CardView: View {
                 .resizable()
                 .aspectRatio(2/3, contentMode: .fit)
         }
-        .frame(width: 100, height: 120)
+        .frame(width: 100, height: cardHeight)
         .transition(.scale(scale: 1))
     }
 }

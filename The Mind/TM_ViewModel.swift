@@ -25,6 +25,10 @@ class TM_ViewModel: ObservableObject{
         return model.gameState
     }
     
+    var gameTime: Double{
+        return model.gameTime
+    }
+    
     var playerHand: Array<Card> {
         return model.playerHand
     }
@@ -80,6 +84,7 @@ class TM_ViewModel: ObservableObject{
     var shurikenActivated: Bool{
         return model.shurikenActivated
     }
+
     
 //    var cardToPlay: Card{
 //        return model.cardToPlay
@@ -117,10 +122,7 @@ class TM_ViewModel: ObservableObject{
     }
     
     func toggleBotPlays(){
-        if model.botPlays{
-            model.botPlays = false
-            print(model.botPlays)
-        }
+        model.botPlays.toggle()
     }
     
     func toggleBotsPlaying(id: Int){
@@ -135,12 +137,14 @@ class TM_ViewModel: ObservableObject{
         model.reset()
     }
     
+    
     // MARK: - GAME CONTROLS
     func playCard(){
         model.playerHand = model.playCard(hand: model.playerHand)
     }
         
     func playJoker(){
+        model.playJoker()
         model.playerShuriken = true
     }
     
