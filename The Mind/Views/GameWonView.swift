@@ -15,9 +15,8 @@ struct GameWonView: View {
                 Text("Congrats!") // Display the message
                     .font(.title)
                     .fontWeight(.bold)
-
                 Text("You finished the game by reaching level \(game.level)")
-                Text("Play time: \(game.gameTime)s")
+                Text("Play time: ")
                     
                 Button("Play again") {
                     game.reset()
