@@ -16,7 +16,7 @@ struct GameOverView: View {
                     .font(.title)
                     .fontWeight(.bold)
                 Text("You reached level \(game.level)")
-                Text("Play time: \(game.gameTime)s")
+                Text("Play time: \(Int(game.gameTime))s")
                     
                 Button("Back to menu") {
                     game.reset()

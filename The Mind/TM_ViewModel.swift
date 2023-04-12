@@ -6,7 +6,7 @@
 import SwiftUI
 
 class TM_ViewModel: ObservableObject{
-    @Published private var model: TM_Model<String> = TM_Model<String>()
+    @Published private var model: TM_Model = TM_Model()
         
     // This checks the status of the bots each 5 seconds.
     func looper(){
@@ -30,7 +30,7 @@ class TM_ViewModel: ObservableObject{
     }
     
     var playerHand: Array<Card> {
-        return model.playerHand
+        return model.player.hand
     }
     
     var boardCard: Card{
@@ -57,6 +57,10 @@ class TM_ViewModel: ObservableObject{
         return model.showPopupMenu
     }
     
+    var popupWon: Bool{
+        return model.showPopupWon
+    }
+    
     var popupOver: Bool{
         return model.showPopupOver
     }
@@ -77,23 +81,6 @@ class TM_ViewModel: ObservableObject{
         return model.shurikens
     }
     
-    var botPlays: Bool{
-        return model.botPlays
-    }
-    
-    var shurikenActivated: Bool{
-        return model.shurikenActivated
-    }
-
-    
-//    var cardToPlay: Card{
-//        return model.cardToPlay
-//    }
-    
-    var botsPlaying: Array<Bool>{
-        return model.botsPlaying
-    }
-        
     // MARK: - MENU CONTROLS
     func play(){
         model.play()
@@ -117,18 +104,6 @@ class TM_ViewModel: ObservableObject{
         model.showPopupMenu.toggle()
     }
     
-    func toggleShuriken(){
-        model.shurikenActivated.toggle()
-    }
-    
-    func toggleBotPlays(){
-        model.botPlays.toggle()
-    }
-    
-    func toggleBotsPlaying(id: Int){
-        model.botsPlaying[id] = false
-    }
-    
     func setBoardCard(card: Card){
         model.boardCard = card
     }
@@ -137,20 +112,31 @@ class TM_ViewModel: ObservableObject{
         model.reset()
     }
     
+    var playerShuriken: Bool{
+        return model.player.shuriken
+    }
+    
+    // MARK: - ANIMATIONS
+    func botAnimation(){
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            for i in 0..<self.model.nBots{self.model.bots[i].playingCard = false}
+        }
+    }
     
     // MARK: - GAME CONTROLS
+    
+    // Player wishs to play a card.
     func playCard(){
-        model.playerHand = model.playCard(hand: model.playerHand)
+        model.player.hand = model.playCard(hand: model.player.hand)
     }
-        
-    func playJoker(){
-        model.playJoker()
-        model.playerShuriken = true
+    
+    // Player wishs to play a shuriken.
+    func toggleShuriken(){
+        model.toggleShuriken()
     }
     
     func resume(){
         looper()
-        model.gameState = 2
         model.botsActive = true
         model.activateView.toggle()
     }

@@ -5,22 +5,18 @@
 
 import Foundation
 
-struct TM_Model<cardContent>{
+struct TM_Model{
     var gameState: Int = 1
     // 1 = Main Menu
     // 2 = Game
     // 3 = Instructions
-    // 4 = Level Up
-    // 5 = Life Lost
-    // 6 = Game Won
-    // 7 = Game Over
-    // 8 = Play Shuriken
     
-    var resumeGame: Bool = true
+    // UI popups
     var showPopupWin: Bool = false
     var showPopupLost: Bool = false
     var showPopupMenu: Bool = false
     var showPopupOver: Bool = false
+    var showPopupWon: Bool = false
     var activateView: Bool = true
     
     // game
@@ -28,26 +24,20 @@ struct TM_Model<cardContent>{
     var life: Int = 3
     var lifeLost = false
     var shurikens = 1
-    var shurikenActivated = false
-    
     var deck: Array<Card>
     var boardCard: Card = Card(id: 0, value: 0)
     var boardCardPrevious: Card = Card(id: 0, value: 0)
-    
     var gameChange: Bool = true
     var gameTime: Double = 0.0
     var gameTimePrevious: Double = 0.0
     
-    // user
-    var playerHand: Array<Card>
-    var playerShuriken = false
+    // player
+    var player: Player
     
     // bots
     var bots: Array<Bot>
     var botsActive = false
     var nBots = 3
-    var botPlays: Bool = false
-    var botsPlaying: Array<Bool> = [false, false, false]
     
     // bot model
     var trial: Int = 0
@@ -55,13 +45,14 @@ struct TM_Model<cardContent>{
     var shortestEstimatePrevious: Double = 0
     
     init(){
+        // init
         deck = Array<Card>()
-        playerHand = Array<Card>()
+        player = Player(hand: Array<Card>())
         bots = Array<Bot>()
         
+        // generate
         deck = generateDeck()
-        playerHand = generateHand()
-        
+        player.hand = generateHand()
         for i in 0..<nBots{
             let bot = Bot(id: i, hand: generateHand())
             bots.append(bot)
@@ -73,16 +64,20 @@ struct TM_Model<cardContent>{
     mutating func gameLoop(){
         gameTime += 1
         
-        // if a change on the board was made, the bot prediction will be recalculated.
-        // if not, the game waits till the timer ticks over the prediction to play the card
+        // PRINTOUTS
+        print("\ngameTime: \(gameTime)s")
+        for i in 0..<bots.count{
+            if !bots[i].hand.isEmpty{
+                let x = Double(round(100 * bots[i].estimate) / 100)
+                print("BOT \(bots[i].id) - ESTIMATE: \(x)s - CARD: \(bots[i].hand[bots[i].hand.count - 1].value) - JOKER: \(bots[i].shuriken) - EMOTION: \(bots[i].emotion)")
+            }
+        }
+        
+        // if a change on the board was made, the bot estimate will be recalculated.
         if gameChange == true{
             
+            print("BOTS UPDATING MODEL")
             generateChunks(bias: false)
-            
-            print("\nBOTS UPDATING MODEL")
-            
-            var totalHands = playerHand.count
-            for i in 0..<bots.count{totalHands += bots[i].hand.count}
             
             for i in 0..<bots.count{
                 
@@ -90,6 +85,7 @@ struct TM_Model<cardContent>{
                 if !bots[i].hand.isEmpty {
                     (bots[i].estimate, bots[i].shuriken, bots[i].emotion, bots[i].scalar) = prediction(bot: bots[i],
                                                                                                        nBots: nBots,
+                                                                                                       playerShuriken: player.shuriken,
                                                                                                        boardCard: boardCard,
                                                                                                        life: life,
                                                                                                        lifeLost: lifeLost,
@@ -97,7 +93,7 @@ struct TM_Model<cardContent>{
                                                                                                        trial: trial,
                                                                                                        previousDeckCard: boardCardPrevious.value,
                                                                                                        RTpreviousRound: shortestEstimate,
-                                                                                                       totalHands: totalHands)
+                                                                                                       totalHands: activeCards())
                     bots[i].estimate += gameTime
                 }
                 else{
@@ -106,32 +102,22 @@ struct TM_Model<cardContent>{
                 }
             }
             
-            // sort according to lowest estimate first, meaning the bot[0] plays first
-//            bots = bots.sorted{$0.estimate < $1.estimate}
+            // tracks of the previous state
             shortestEstimatePrevious = shortestEstimate
             shortestEstimate = bots.min{$0.estimate < $1.estimate}!.estimate
             
-            gameChange = false
-        }
-        else{
             
-            print("\ngameTime: \(gameTime)s")
+            gameChange = false
+        }else{
             
             for i in 0..<bots.count{
                 
+                // bot plays a card
                 if !bots[i].hand.isEmpty && (bots[i].estimate <= gameTime || emptyHand(id: bots[i].id) == true){
                     print("BOT \(bots[i].id) PLAYING CARD: \(bots[i].hand.last!.value)")
-                    botsPlaying[i] = true
-                    botPlays = true
-                    //wait a bit before playing for the animation
+                    bots[i].playingCard = true
                     bots[i].hand = playCard(hand: bots[i].hand)
                     break
-                }
-                
-                if !bots[i].hand.isEmpty{
-                    let x = Double(round(100 * bots[i].estimate) / 100)
-                    let y = Double(round(100 * bots[i].emotion) / 100)
-                    print("BOT \(bots[i].id) - ESTIMATE: \(x)s - CARD: \(bots[i].hand[bots[i].hand.count - 1].value) - JOKER: \(bots[i].shuriken) - EMOTION: \(y)")
                 }
             }
         }
@@ -141,24 +127,23 @@ struct TM_Model<cardContent>{
             
             // if level 10 has been reached, the game was won, otherwise level up
             if level >= 10{
-                gameState = 6
+                showPopupWon = true
                 botsActive = false
             }else{
                 levelUp()
                 activateView = false
                 showPopupWin = true
                 botsActive = false
+                player.shuriken = false
             }
         }
         
         // check if a mistake was made, if true reduce a life and remove lower cards.
-        // still needs a life lost screen and card burn feedback
         else if looseCondition(){
             
             // game over
             if life <= 1{
                 showPopupOver = true
-//                gameState = 7
                 botsActive = false
             }else{
                 removeCards()
@@ -170,18 +155,18 @@ struct TM_Model<cardContent>{
                 activateView = false
                 showPopupLost = true
                 botsActive = false
+                player.shuriken = false
             }
-        } else if(shurikens > 0 && bots.allSatisfy{$0.shuriken} && playerShuriken){
-            shurikens -= 1
-            // set the first card in the hands to reveal.
-            if !playerHand.isEmpty{playerHand[playerHand.count - 1].reveal = true}
-            for i in 0..<bots.count where !bots[i].hand.isEmpty{bots[i].hand[bots[i].hand.count - 1].reveal = true}
+        }
+        
+        // play a shuriken if all agree
+        else if(shurikens > 0 && bots.allSatisfy{$0.shuriken} && player.shuriken){
+            print("PLAY JOKER")
+            playShuriken()
         }
         
         lifeLost = false
     }
-    
-    // ==================================== AUXILIARY FUNCTIONS ==================================== //
     
     // MARK: - GAME LOGIC
     // generates a deck of 100 cards.
@@ -222,7 +207,7 @@ struct TM_Model<cardContent>{
         level += 1
         
         deck = generateDeck()
-        playerHand = generateHand()
+        player.hand = generateHand()
         
         for i in 0..<bots.count{
             bots[i].hand = generateHand()
@@ -232,10 +217,11 @@ struct TM_Model<cardContent>{
         gameChange = true
     }
     
+    // removes all cards lower then the current board card
     mutating func removeCards(){
         
-        while playerHand.count != 0 && playerHand[playerHand.count - 1].value < boardCard.value {
-            playerHand.removeLast()
+        while player.hand.count != 0 && player.hand[player.hand.count - 1].value < boardCard.value {
+            player.hand.removeLast()
         }
         
         for i in 0..<bots.count where bots[i].hand.count != 0 && bots[i].hand.last!.value < boardCard.value{
@@ -248,7 +234,7 @@ struct TM_Model<cardContent>{
     // checks if the game has been won
     mutating func winCondition() -> Bool{
         
-        if (!playerHand.isEmpty){
+        if (!player.hand.isEmpty){
             return false
         }
         
@@ -261,7 +247,7 @@ struct TM_Model<cardContent>{
     // checks if the game has been lost
     mutating func looseCondition() -> Bool{
         
-        if playerHand.count != 0 && playerHand[playerHand.count - 1].value < boardCard.value{
+        if player.hand.count != 0 && player.hand[player.hand.count - 1].value < boardCard.value{
             return true
         }
         
@@ -286,82 +272,30 @@ struct TM_Model<cardContent>{
         gameTimePrevious = gameTime
     }
     
-    // MARK: - GAME CONTROL
-    
-    // starts the game on the main menu.
-    mutating func play(){
-        gameState = 2
-        botsActive = true
-    }
-    
-    mutating func instructions(){
-        gameState = 3
-    }
-    
-    mutating func mainMenu(){
-        gameState = 1
-        botsActive = false
-    }
-    
-    // restarts the game at level 1 when the cross is clicked.
-    mutating func reset(){
-        self = TM_Model()
-    }
-    
-    
-    // plays the lowest card from the array, and returns the updated hand.
-    mutating func playCard(hand: Array<Card>) -> Array<Card>{
-        var hand = hand
+    // calculate the total amount of cards in play
+    mutating func activeCards() -> Int{
         
-        if (hand.count != 0){
-            botPlays = true
-            boardCardPrevious = boardCard
-            boardCard = hand.removeLast()
-//            boardCard.played = true
-        }
+        var active = player.hand.count
+        for i in 0..<bots.count{active += bots[i].hand.count}
         
+        return active
+    }
+    
+    // plays the joker and sets respective cards to reveal
+    mutating func playShuriken(){
+        shurikens -= 1
+        // set the first card in the hands to reveal.
+        if !player.hand.isEmpty{player.hand[player.hand.count - 1].reveal = true}
+        for i in 0..<bots.count where !bots[i].hand.isEmpty{bots[i].hand[bots[i].hand.count - 1].reveal = true}
+        player.shuriken = false
         gameChange = true
-        return hand
-    }
-
-    // plays lowest cards from bot and player when joker is used
-    mutating func playJoker(){
-        shurikens = shurikens - 1
-        var cards: [Int] = []
-        
-        if playerHand.count != 0 {
-            let lastCard = playerHand.last
-            cards.append(lastCard!.value)
-            playerHand.removeLast()
-        }
-        
-        for i in 0..<bots.count where bots[i].hand.count != 0 {
-            while bots[i].hand.count != 0 {
-                let lastCard = bots[i].hand.last
-                cards.append(lastCard!.value)
-                bots[i].hand.removeLast()
-            }
-        }
-        
-        cards.sort()
-        
-        for card in cards{
-            let newCard = Card(id: card, value: card, played: true, reveal: false)
-            boardCard = newCard
-//            boardCard.played = true
-        }
-        
-        gameChange = true
-        
-        // toggle shuriken back
-        shurikenActivated = false
     }
     
     // checks if a bot should empty their hand because they are the last left with cards
     mutating func emptyHand(id: Int) -> Bool{
         let id = id
         
-        if playerHand.count != 0{
+        if player.hand.count != 0{
             return false
         }
         
@@ -371,18 +305,65 @@ struct TM_Model<cardContent>{
                 return false
             }
         }
-        print("emptying hand -->")
         return true
+    }
+    
+    // MARK: - GAME CONTROL
+    // sets the state to main menu
+    mutating func mainMenu(){
+        gameState = 1
+        botsActive = false
+    }
+    
+    // changes the state to start the game
+    mutating func play(){
+        gameState = 2
+        botsActive = true
+    }
+    
+    // changes the state to the instructions
+    mutating func instructions(){
+        gameState = 3
+    }
+
+    // restarts the game at level 1 when the cross is clicked.
+    mutating func reset(){
+        self = TM_Model()
+    }
+    
+    // plays the lowest card from the array, and returns the updated hand.
+    mutating func playCard(hand: Array<Card>) -> Array<Card>{
+        var hand = hand
+        
+        if (hand.count != 0){
+            boardCardPrevious = boardCard
+            boardCard = hand.removeLast()
+        }
+        
+        gameChange = true
+        return hand
+    }
+    
+    // toggles the player desire to play a shuriken.
+    mutating func toggleShuriken(){
+        player.shuriken.toggle()
+        gameChange = true
     }
 }
 
-//     MARK: - Card
+// MARK: - Card
 struct Card: Identifiable {
     var id: Int
     var value: Int
-    var played = false
     var reveal = false
     var filename: String {return "\(value)"}
+}
+
+// MARK: - Player
+struct Player: Identifiable{
+    var id = "player"
+    var hand: Array<Card>
+    var shuriken = false
 }
 
 // MARK: - Bot
@@ -390,8 +371,9 @@ struct Bot: Identifiable {
     var id: Int
     var model = Model()
     var hand: Array<Card>
+    var playingCard = false
     var estimate = 100.0
     var shuriken = false
-    var emotion = 0.0
+    var emotion = 0
     var scalar = 1.0
 }

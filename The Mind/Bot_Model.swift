@@ -5,6 +5,7 @@
 
 import Foundation
 import Accelerate
+import GameplayKit
 
 // Hyperparameter
 
@@ -25,7 +26,7 @@ let typeofActivation = "exponential " // ["linear", "exponential"," Sigmoid_cust
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-func prediction(bot: Bot, nBots: Int, boardCard: Card, life: Int, lifeLost: Bool , level: Int, trial: Int, previousDeckCard: Int, RTpreviousRound: Double, totalHands: Int) -> (Double, Bool, Double, Double){
+func prediction(bot: Bot, nBots: Int, playerShuriken: Bool, boardCard: Card, life: Int, lifeLost: Bool , level: Int, trial: Int, previousDeckCard: Int, RTpreviousRound: Double, totalHands: Int) -> (Double, Bool, Int, Double){
     
     // TRANSLATION:
     let cardsPlayer = bot.hand
@@ -45,13 +46,14 @@ func prediction(bot: Bot, nBots: Int, boardCard: Card, life: Int, lifeLost: Bool
     let RTpreviousRound = RTpreviousRound
     let scalar = bot.scalar
     let level = level
-    let jokerRequest = bot.shuriken
+    let jokerRequest = playerShuriken
     
-    var (rt, joker, emotion, newScalar) = onePrediction(Deck: cardsPlayerValues, minCardPlayer: minCardPlayer, tableCard: tableCard, nrOfPlayer: nrOfPlayer, JokerRequest: jokerRequest, totalLife: totalLife, PlayerAmountofCards: playerAmountOfCards, m: m, trialNr: trialNr, lifeLostpreviousRound: lifeLostPreviousRound, bot: bot, RTpreviousRound: RTpreviousRound, previoustablecard: previousDeckCard, scalar: scalar, level: level)
-    
-    
-    //    print(minCardPlayer, "= mincard  || Difference  = ", abs(tableCard - minCardPlayer), " || rt = " , rt, " Scalar =", newScalar)
+    var (rt, joker, newScalar) = onePrediction(Deck: cardsPlayerValues, minCardPlayer: minCardPlayer, tableCard: tableCard, nrOfPlayer: nrOfPlayer, JokerRequest: jokerRequest, totalLife: totalLife, PlayerAmountofCards: playerAmountOfCards, m: m, trialNr: trialNr, lifeLostpreviousRound: lifeLostPreviousRound, bot: bot, RTpreviousRound: RTpreviousRound, previoustablecard: previousDeckCard, scalar: scalar, level: level)
     rt *= gamespeed
+        
+    // samples an emotion from a normal with the range of -rt/3 and +rt/3
+    let distribution = GKGaussianDistribution(lowestValue: -Int(round(rt/3)), highestValue: Int(round(rt/3)))
+    let emotion = distribution.nextInt()
     
     return (rt, joker, emotion, newScalar)
 }
@@ -60,7 +62,7 @@ func prediction(bot: Bot, nBots: Int, boardCard: Card, life: Int, lifeLost: Bool
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-func onePrediction(Deck: [Int], minCardPlayer: Int, tableCard: Int, nrOfPlayer: Int, JokerRequest: Bool, totalLife: Int, PlayerAmountofCards: Int, m: Model, trialNr: Int, lifeLostpreviousRound: Bool, bot: Bot, RTpreviousRound: Double, previoustablecard: Int, scalar: Double, level: Int) -> (Double, Bool, Double, Double) {
+func onePrediction(Deck: [Int], minCardPlayer: Int, tableCard: Int, nrOfPlayer: Int, JokerRequest: Bool, totalLife: Int, PlayerAmountofCards: Int, m: Model, trialNr: Int, lifeLostpreviousRound: Bool, bot: Bot, RTpreviousRound: Double, previoustablecard: Int, scalar: Double, level: Int) -> (Double, Bool, Double) {
     
     let perception_time = 0.11 // Time to perceive the stimulus
     let response_time = 0.2 // for execution of motor response
@@ -72,7 +74,7 @@ func onePrediction(Deck: [Int], minCardPlayer: Int, tableCard: Int, nrOfPlayer: 
         var waiting = difference_to_pulses(0.0, tableCard: tableCard)
         waiting = Int(pulses_to_time(Int(waiting)))
         let RT = perception_time + response_time + Double(waiting)
-        return (RT, false, (RT)/4, 0)
+        return (RT, false, 0)
     }
     
     // When they have a joker Request i Accept
@@ -80,7 +82,7 @@ func onePrediction(Deck: [Int], minCardPlayer: Int, tableCard: Int, nrOfPlayer: 
         let pulses = difference_to_pulses(0.0, tableCard:  tableCard)
         let waiting = Int(pulses_to_time(Int(pulses)))
         let RT = perception_time + response_time + Double(waiting)
-        return (RT, true, -1, 0)
+        return (RT, true, 0)
     }
     
     // When my total life is low, or the amount of cards left and the amount of cards we have is the same (difficult)
@@ -88,7 +90,7 @@ func onePrediction(Deck: [Int], minCardPlayer: Int, tableCard: Int, nrOfPlayer: 
         let pulses = difference_to_pulses(0.0, tableCard: tableCard)
         let waiting = pulses_to_time(Int(pulses))
         let RT = perception_time + response_time + waiting
-        return (RT, true, -1, 0)
+        return (RT, true, 0)
     }
     
     pulses = determinePulses(m: m, Deck: Deck, nrPlayer: nrOfPlayer, tableCard: tableCard, totalLife: totalLife, trialNr: trialNr) // Counting (linear & non-linear
@@ -124,7 +126,7 @@ func onePrediction(Deck: [Int], minCardPlayer: Int, tableCard: Int, nrOfPlayer: 
         RT *= previousPlayAdaptation(RTpreviousRound: RTpreviousRound, previousDeckCard: previoustablecard, tableCard: tableCard, m: m)
     }
     
-    return (RT, false, RT/4, scalar)
+    return (RT, false, scalar)
 }
 
 

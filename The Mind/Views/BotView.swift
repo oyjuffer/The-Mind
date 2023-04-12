@@ -23,7 +23,7 @@ struct BotView: View {
                 .frame(width: 100, height: 100)
             
             // Calculates the time difference in order to show an emotion for the bot
-            let timeDifference = Double(round(100 * bot.estimate) / 100) - game.gameTime
+            let timeDifference = Double(round(100 * bot.estimate) / 100) - game.gameTime + Double(bot.emotion)
             
             if timeDifference <= 15 || game.popupWin{
                 Image("happy")
@@ -45,31 +45,25 @@ struct BotView: View {
                     .clipShape(Circle())
             }
             
-
+            
             VStack {
                 Spacer()
                 
                 HStack {
                     ZStack {
-                        if game.botsPlaying[bot.id]{
+                        if bot.playingCard{
                             //Shows a card next to the bot whenever the bot wants to play
                             CardView(game: game, card: "back-card", cardHeight: 60)
                                 .animation(.spring())
-                                .onAppear {
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                        game.toggleBotsPlaying(id: bot.id)
-                                        
-                                    }
-                                }
+                                .onAppear{game.botAnimation()}
                         } else {
                             RoundedRectangle(cornerRadius: 20)
                                 .fill(Color.clear)
                                 .frame(width: 100, height: 60)
                         }
-                            
                     }
                     .offset(x: -15, y: 30)
-
+                    
                     ZStack {
                         //Shows the number of cards in the hand of the bot
                         Rectangle()
@@ -80,6 +74,22 @@ struct BotView: View {
                         Text("\(content)")
                             .foregroundColor(.white)
                             .font(.system(size: 14))
+                        
+                        VStack {
+                            //Shows if the bot will play a joker
+                            if bot.shuriken{
+                                Rectangle()
+                                    .fill(Color(#colorLiteral(red: 1, green: 0.149, blue: 0.149, alpha: 1.0)))
+                                    .frame(width: 10, height: 10)
+                                    .cornerRadius(5)
+                            }else{
+                                Rectangle()
+                                    .fill(Color(#colorLiteral(red: 0.1205435768, green: 0.2792448401, blue: 0.4109080434, alpha: 1)))
+                                    .frame(width: 10, height: 10)
+                                    .cornerRadius(5)
+                            }
+                        }
+                        .offset(x: 10, y: 10)
                     }
                     .offset(x: -6, y: 15)
                 }

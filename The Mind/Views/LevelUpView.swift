@@ -17,12 +17,12 @@ struct LevelUpView: View {
                     .fontWeight(.bold)
                 Text("Congratulations, you reached level \(game.level)!")
                     
-                if game.level == 3 || game.level == 6 || game.level == 9{
+                if game.level == 4 || game.level == 7 || game.level == 10{
                     Text("You have earned an extra life!")
                 }
                     
-                if game.level == 2 || game.level == 5 || game.level == 8 {
-                    Text("You have earned an extra joker!")
+                if game.level == 3 || game.level == 6 || game.level == 9 {
+                    Text("You have earned an extra shuriken!")
                 }
 
                 Button("Continue") { // Button to dismiss the popup

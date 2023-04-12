@@ -83,38 +83,26 @@ struct GameView: View {
                     }
                     
                     // joker show cards of bots
-                    if (game.shurikenActivated){
-                        LazyVGrid(columns: [GridItem(), GridItem(), GridItem()]) {
-                            ForEach(game.bots, id: \.id) { bot in
-                                if let lastCard = bot.hand.last{
+                    LazyVGrid(columns: [GridItem(), GridItem(), GridItem()]) {
+                        ForEach(game.bots, id: \.id) { bot in
+                            if let lastCard = bot.hand.last{
+                                
+                                if lastCard.reveal{
                                     CardView(game: game, card: lastCard.filename, cardHeight: 120)
                                         .aspectRatio(1/2, contentMode: .fit)
                                         .matchedGeometryEffect(id: lastCard.id, in: animation)
                                         .transition(AnyTransition.asymmetric(insertion: .opacity, removal: .opacity))
+                                } else{
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .fill(Color.clear)
+                                        .frame(height: 120)
                                 }
+                            }else {
+                                RoundedRectangle(cornerRadius: 20)
+                                    .fill(Color.clear)
+                                    .frame(height: 120)
                             }
                         }
-                    }
-//                    else if game.botPlays {
-//                        //select one of the columns??
-//                        LazyVGrid(columns: [GridItem(), GridItem(), GridItem()]) {
-//                            for i in game.botsPlaying.count {
-//                                if game.botsPlaying[i] {
-//                                    CardView(game: game, card: "back_card", cardHeight: 70)
-//                                        .animation(.spring())
-//                                        .onAppear {
-//                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-//                                                game.toggleBotsPlaying(id: bot.id)
-//                                            }
-//                                        }
-//                                }
-//                            }
-//                        }
-//                    }
-                    else{
-                        RoundedRectangle(cornerRadius: 20)
-                            .fill(Color.clear)
-                            .frame(height: 120)
                     }
                     
                     boardView(card: game.boardCard, animation: animation, namespace: animation, game: game)
@@ -144,20 +132,22 @@ struct GameView: View {
                                         Button(action: {
                                             if game.shuriken != 0 {
                                                 game.toggleShuriken()
-                                                game.pause()
-                                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                                                    game.playJoker()
-                                                    game.resume()
-                                                }
                                                 
                                             }
                                         }) {
                                             ZStack {
-                                                Rectangle()
-                                                    .fill(Color(#colorLiteral(red: 0.1205435768, green: 0.2792448401, blue: 0.4109080434, alpha: 1)))
-                                                    .frame(width: 30, height: 30)
-                                                    .cornerRadius(5)
                                                 
+                                                if game.playerShuriken{
+                                                    Rectangle()
+                                                        .fill(Color(#colorLiteral(red: 1, green: 0.149, blue: 0.149, alpha: 1.0)))
+                                                        .frame(width: 30, height: 30)
+                                                        .cornerRadius(5)
+                                                }else{
+                                                    Rectangle()
+                                                        .fill(Color(#colorLiteral(red: 0.1205435768, green: 0.2792448401, blue: 0.4109080434, alpha: 1)))
+                                                        .frame(width: 30, height: 30)
+                                                        .cornerRadius(5)
+                                                }
                                                 Text("\(game.shuriken)")
                                                     .foregroundColor(.white)
                                                     .font(.system(size: 14))
@@ -188,13 +178,13 @@ struct GameView: View {
                                         ZStack {
                                             Rectangle()
                                                 .fill(Color(#colorLiteral(red: 0.1205435768, green: 0.2792448401, blue: 0.4109080434, alpha: 1)))
-//                                                .fill(Color(#colorLiteral(red: 0.97, green: 0.94, blue: 0.89, alpha: 1)))
+                                            //                                                .fill(Color(#colorLiteral(red: 0.97, green: 0.94, blue: 0.89, alpha: 1)))
                                                 .frame(width: 30, height: 30)
                                                 .cornerRadius(5)
                                             
                                             Text("\(game.life)")
                                                 .foregroundColor(.white)
-//                                                .foregroundColor(.black)
+                                            //                                                .foregroundColor(.black)
                                                 .font(.system(size: 14))
                                         }
                                         .offset(x: 10, y: -10)
@@ -247,6 +237,10 @@ struct GameView: View {
                 VStack {
                     GameOverView(game: game)
                 }
+            } else if game.popupWon{
+                VStack{
+                    GameWonView(game: game)
+                }
             }
         }
     }
@@ -287,9 +281,9 @@ struct boardView: View {
         ZStack{
             RoundedRectangle(cornerRadius: 20)
                 .fill(Color.clear)
-//                .stroke(lineWidth: 3)
+            //                .stroke(lineWidth: 3)
                 .frame(height: 200)
-                
+            
             
             if card.value != 0 {
                 
