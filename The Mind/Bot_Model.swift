@@ -26,7 +26,7 @@ let typeofActivation = "exponential " // ["linear", "exponential"," Sigmoid_cust
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-func prediction(bot: Bot, nBots: Int, playerShuriken: Bool, boardCard: Card, life: Int, lifeLost: Bool , level: Int, trial: Int, previousDeckCard: Int, RTpreviousRound: Double, totalHands: Int) -> (Double, Bool, Int, Double){
+func prediction(bot: Bot, nBots: Int, playerShuriken: Bool, boardCard: Card, revealedCards: Array<Card>, life: Int, lifeLost: Bool , level: Int, trial: Int, previousDeckCard: Int, RTpreviousRound: Double, totalHands: Int) -> (Double, Bool, Int, Double){
     
     // TRANSLATION:
     let cardsPlayer = bot.hand
@@ -34,6 +34,13 @@ func prediction(bot: Bot, nBots: Int, playerShuriken: Bool, boardCard: Card, lif
     for card in cardsPlayer{
         cardsPlayerValues.append(card.value)
     }
+    
+    // array of revealed cards, element 1 is the smallest
+    var cardsShown = Array<Int>()
+    for card in revealedCards{
+        cardsShown.append(card.value)
+    }
+    
     let minCardPlayer = cardsPlayerValues[cardsPlayerValues.count - 1]
     let nrOfPlayer = nBots + 1
     let playerAmountOfCards = totalHands

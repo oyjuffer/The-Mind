@@ -30,6 +30,7 @@ struct TM_Model{
     var gameChange: Bool = true
     var gameTime: Double = 0.0
     var gameTimePrevious: Double = 0.0
+    var revealedCards: Array<Card>
     
     // player
     var player: Player
@@ -49,6 +50,7 @@ struct TM_Model{
         deck = Array<Card>()
         player = Player(hand: Array<Card>())
         bots = Array<Bot>()
+        revealedCards = Array<Card>()
         
         // generate
         deck = generateDeck()
@@ -87,6 +89,7 @@ struct TM_Model{
                                                                                                        nBots: nBots,
                                                                                                        playerShuriken: player.shuriken,
                                                                                                        boardCard: boardCard,
+                                                                                                       revealedCards: revealedCards,
                                                                                                        life: life,
                                                                                                        lifeLost: lifeLost,
                                                                                                        level: level,
@@ -281,12 +284,24 @@ struct TM_Model{
         return active
     }
     
-    // plays the joker and sets respective cards to reveal
+    // plays the joker and sets respective cards to reveal. Also saves these cards for the prediction function.
     mutating func playShuriken(){
         shurikens -= 1
         // set the first card in the hands to reveal.
         if !player.hand.isEmpty{player.hand[player.hand.count - 1].reveal = true}
         for i in 0..<bots.count where !bots[i].hand.isEmpty{bots[i].hand[bots[i].hand.count - 1].reveal = true}
+        
+        revealedCards = Array<Card>()
+        
+        if player.hand.count != 0 {
+            revealedCards.append(player.hand.last!)
+        }
+        
+        for i in 0..<bots.count where bots[i].hand.count != 0 {
+                revealedCards.append(bots[i].hand.last!)
+        }
+        
+        revealedCards.sort{$0.value < $1.value}
         player.shuriken = false
         gameChange = true
     }
