@@ -96,7 +96,8 @@ struct TM_Model{
                                                                                                        trial: trial,
                                                                                                        previousDeckCard: boardCardPrevious.value,
                                                                                                        RTpreviousRound: shortestEstimate,
-                                                                                                       totalHands: activeCards())
+                                                                                                       totalHands: activeCards(),
+                                                                                                       difficultyLevel: player.gameDifficuly)
                     bots[i].estimate += gameTime
                 }
                 else{
@@ -353,6 +354,10 @@ struct TM_Model{
         if (hand.count != 0){
             boardCardPrevious = boardCard
             boardCard = hand.removeLast()
+            
+            if (revealedCards.count != 0) && (boardCard.id == revealedCards[0].id){
+                revealedCards.removeFirst()
+            }
         }
         
         gameChange = true
@@ -379,6 +384,7 @@ struct Player: Identifiable{
     var id = "player"
     var hand: Array<Card>
     var shuriken = false
+    var gameDifficuly = 1.0
 }
 
 // MARK: - Bot
