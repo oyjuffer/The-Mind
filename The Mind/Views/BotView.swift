@@ -25,19 +25,19 @@ struct BotView: View {
             // Calculates the time difference in order to show an emotion for the bot
             let timeDifference = Double(round(100 * bot.estimate) / 100) - game.gameTime + Double(bot.emotion)
             
-            if timeDifference <= 15 || game.popupWin{
+            if timeDifference <= 8 || game.popupWin{
                 Image("happy")
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 70, height: 70)
                     .clipShape(Circle())
-            } else if timeDifference > 15 && timeDifference <= 50 {
+            } else if timeDifference > 8 && timeDifference <= 20 {
                 Image("normal")
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 70, height: 70)
                     .clipShape(Circle())
-            } else if timeDifference > 50 || game.popupLost{
+            } else if timeDifference > 20 || game.popupLost{
                 Image("sad")
                     .resizable()
                     .aspectRatio(contentMode: .fill)
