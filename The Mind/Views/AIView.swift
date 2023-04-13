@@ -52,9 +52,9 @@ struct AIView: View {
                     
                     // Picker
                     Picker("Difficulty", selection: $levelDifficulty) {
-                        Text("Easy").tag(0.75)
+                        Text("Easy").tag(1.25)
                         Text("Medium").tag(1.0)
-                        Text("Hard").tag(1.25)
+                        Text("Hard").tag(0.75)
                     }
                     .pickerStyle(SegmentedPickerStyle())
                     .padding()

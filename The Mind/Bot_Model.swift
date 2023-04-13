@@ -9,7 +9,7 @@ import GameplayKit
 
 // Hyperparameter - can be tuned
 let mixingPrediction = true // can also be false
-let mixingPredictionPercent = 0.5
+let mixingPredictionPercent = 0.8
 let factorPP = 0.01 // one precent impact of previous game
 let factorGD = 0.01 // one precent reduced speed when for each element making the game more difficult (2 (100% of the game speed) vs 4 player (98% of the game speed)
 let adaptation = 3 // [0, 1, 2, 3] -> [0 means no adaptation, 1 means short term, 2 means long term, 3 means short & longterm]
@@ -19,7 +19,7 @@ let gamespeed = 0.25 // gamespeed > 1 means we slow it dowm. gamespeed < 1, we i
 // new
 let noiseImpact = true // [True | False] = True for realistic model, more difficult, translation between numbers and waiting time more disrupted
 let strategy = "Counting" // ["Counting", "Gabs"]
-let typeofActivation = "exponential " // ["linear", "exponential"," Sigmoid_custome"]
+let typeofActivation = "linear " // ["linear", "exponential"," Sigmoid_custome"]
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -127,7 +127,7 @@ func onePrediction(Deck: [Int], minCardPlayer: Int, tableCard: Int, nrOfPlayer: 
         
         // A joker request has been made by the player
         if JokerRequest {
-            let pulses = difference_to_pulses(0.0, tableCard:  tableCard)
+            let pulses = difference_to_pulses(100.0, tableCard:  tableCard)
             let waiting = Int(pulses_to_time(Int(pulses)))
             let RT = perception_time + response_time + Double(waiting)
             return (RT, true, 0)}
@@ -180,7 +180,7 @@ func onePrediction(Deck: [Int], minCardPlayer: Int, tableCard: Int, nrOfPlayer: 
         RT *= gameDifficulty(nrOfPlayer: nrOfPlayer, totalLife: totalLife, lifeLostpreviousRound: lifeLostpreviousRound, trialNr: trialNr, level: level, totalAmoundCards: PlayerAmountofCards, tableCard: tableCard, minCardPlayer: minCardPlayer)
         RT *= previousPlayAdaptation(RTpreviousRound: RTpreviousRound, previousDeckCard: previoustablecard, tableCard: tableCard, m: m)
     }
-    
+    print("The difference is =", abs(tableCard - minCardPlayer))
     return (RT, false, scalar)
 }
 
