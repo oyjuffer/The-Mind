@@ -66,8 +66,6 @@ struct AIView: View {
                     
                     Button(action: {
                         game.play()
-                        print(game.difficultyLevel)
-                        print(game.nBots)
                     }) {
                         Text("Play")
                             .font(.title)

@@ -119,7 +119,7 @@ func onePrediction(Deck: [Int], minCardPlayer: Int, tableCard: Int, nrOfPlayer: 
         var waiting = difference_to_pulses(0.0, tableCard: tableCard)
         waiting = Int(pulses_to_time(Int(waiting)))
         let RT = perception_time + response_time + Double(waiting)
-        return (RT, false, 0)
+        return (RT, false, scalar)
         
         
         
@@ -130,11 +130,7 @@ func onePrediction(Deck: [Int], minCardPlayer: Int, tableCard: Int, nrOfPlayer: 
             let pulses = difference_to_pulses(100.0, tableCard:  tableCard)
             let waiting = Int(pulses_to_time(Int(pulses)))
             let RT = perception_time + response_time + Double(waiting)
-            return (RT, true, 0)}
-        
-        
-        
-        
+            return (RT, true, scalar)}
     }
     
     // No request and no Edge case - determine pulses
@@ -152,27 +148,15 @@ func onePrediction(Deck: [Int], minCardPlayer: Int, tableCard: Int, nrOfPlayer: 
     
     var RT = perception_time + waiting + response_time
     switch adaptation {
-        
-        
-        
     case 0: // NO ADAPTATION
         RT *= 1
-        
-        
-        
     case 1: // LONG TERM ADAPTATION
         var scalar = scalar
         scalar *= previousPlayAdaptation(RTpreviousRound: RTpreviousRound, previousDeckCard: previoustablecard, tableCard: tableCard, m: m)
         RT *= scalar
-        
-        
-        
     case 2: // Short TERM ADAPTATION
         RT *= gameDifficulty(nrOfPlayer: nrOfPlayer, totalLife: totalLife, lifeLostpreviousRound: lifeLostpreviousRound, trialNr: trialNr, level: level, totalAmoundCards: PlayerAmountofCards, tableCard: tableCard, minCardPlayer: minCardPlayer)
         RT *= previousPlayAdaptation(RTpreviousRound: RTpreviousRound, previousDeckCard: previoustablecard, tableCard: tableCard, m: m)
-        
-        
-        
     default: // LONG & Short TERM ADAPTATION
         var scalar = scalar
         scalar *= previousPlayAdaptation(RTpreviousRound: RTpreviousRound, previousDeckCard: previoustablecard, tableCard: tableCard, m: m)
@@ -180,7 +164,7 @@ func onePrediction(Deck: [Int], minCardPlayer: Int, tableCard: Int, nrOfPlayer: 
         RT *= gameDifficulty(nrOfPlayer: nrOfPlayer, totalLife: totalLife, lifeLostpreviousRound: lifeLostpreviousRound, trialNr: trialNr, level: level, totalAmoundCards: PlayerAmountofCards, tableCard: tableCard, minCardPlayer: minCardPlayer)
         RT *= previousPlayAdaptation(RTpreviousRound: RTpreviousRound, previousDeckCard: previoustablecard, tableCard: tableCard, m: m)
     }
-    print("The difference is =", abs(tableCard - minCardPlayer))
+    
     return (RT, false, scalar)
 }
 
@@ -313,14 +297,13 @@ func previousPlayAdaptation(RTpreviousRound: Double, previousDeckCard: Int, tabl
     var scalar = 1.0
     let factor = factorPP // Hyperparameter currently 1%
     
-    
     // conceptually we retrieve the chunk (memory from the last round)
     let chunk = Chunk(s: "chunk", m: m)
     
     //
     chunk.setSlot(slot:"CurrentDifference", value: Double(currentDifference))
     let (_, retrievedChunk) = m.dm.retrieve(chunk: chunk)
-    
+        
     if retrievedChunk != nil{
         
         let pulsesOfOther = Double(difference_to_pulses(RTpreviousRound, tableCard: tableCard))
@@ -334,7 +317,6 @@ func previousPlayAdaptation(RTpreviousRound: Double, previousDeckCard: Int, tabl
             scalar -= factor
         }
     }
-    
     return scalar
 }
 
@@ -372,7 +354,7 @@ func gameDifficulty(nrOfPlayer: Int, totalLife: Int, lifeLostpreviousRound: Bool
     if difference <= 3 || totalAmoundCards < 3 {
         scale += difference * factor
     }
-    
+
     
     return scale
 }

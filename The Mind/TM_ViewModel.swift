@@ -42,7 +42,7 @@ class TM_ViewModel: ObservableObject{
     }
     
     var life: Int{
-        return model.life
+        return model.lives
     }
     
     var popupWin: Bool{
@@ -92,7 +92,7 @@ class TM_ViewModel: ObservableObject{
     // MARK: - MENU CONTROLS
     func play(){
         model.play()
-        model.generateBotArray()
+        model.startGame()
         looper()
     }
     

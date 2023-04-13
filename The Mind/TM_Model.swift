@@ -22,22 +22,23 @@ struct TM_Model{
     
     // game
     var level: Int = 1  // would update +1 on win
-    var life: Int = 3
+    var lives: Int = 4
+    var shurikens: Int = 1
+    var lastLevel: Int = 8
     var lifeLost = false
-    var shurikens = 1
-    var deck: Array<Card>
+    var deck: Array<Card> = Array<Card>()
     var boardCard: Card = Card(id: 0, value: 0)
     var boardCardPrevious: Card = Card(id: 0, value: 0)
     var gameChange: Bool = true
     var gameTime: Double = 0.0
     var gameTimePrevious: Double = 0.0
-    var revealedCards: Array<Card>
+    var revealedCards: Array<Card> = Array<Card>()
     
     // player
-    var player: Player
+    var player: Player = Player()
     
     // bots
-    var bots: Array<Bot>
+    var bots: Array<Bot> = Array<Bot>()
     var botsActive = false
     var nBots: Int = 3
     
@@ -45,22 +46,6 @@ struct TM_Model{
     var trial: Int = 0
     var shortestEstimate: Double = 0
     var shortestEstimatePrevious: Double = 0
-    
-    init(){
-        // init
-        deck = Array<Card>()
-        player = Player(hand: Array<Card>())
-        bots = Array<Bot>()
-        revealedCards = Array<Card>()
-        
-        // generate
-        deck = generateDeck()
-        player.hand = generateHand()
-        for i in 0..<nBots{
-            let bot = Bot(id: i, hand: generateHand())
-            bots.append(bot)
-        }
-    }
     
     // MARK: - GAME LOOP
     // This is the gameLoop which runs each second and check various states of the game.
@@ -72,7 +57,7 @@ struct TM_Model{
         for i in 0..<bots.count{
             if !bots[i].hand.isEmpty{
                 let x = Double(round(100 * bots[i].estimate) / 100)
-                print("BOT \(bots[i].id) - ESTIMATE: \(x)s - CARD: \(bots[i].hand[bots[i].hand.count - 1].value) - JOKER: \(bots[i].shuriken) - EMOTION: \(bots[i].emotion)")
+                print("BOT \(bots[i].id) - ESTIMATE: \(x)s - CARD: \(bots[i].hand[bots[i].hand.count - 1].value) - JOKER: \(bots[i].shuriken) - EMOTION: \(bots[i].emotion) - SCALAR: \(bots[i].scalar)")
             }
         }
         
@@ -91,7 +76,7 @@ struct TM_Model{
                                                                                                        playerShuriken: player.shuriken,
                                                                                                        boardCard: boardCard,
                                                                                                        revealedCards: revealedCards,
-                                                                                                       life: life,
+                                                                                                       life: lives,
                                                                                                        lifeLost: lifeLost,
                                                                                                        level: level,
                                                                                                        trial: trial,
@@ -104,6 +89,7 @@ struct TM_Model{
                 else{
                     // no cards in hand anymore
                     bots[i].estimate = 100000000
+                    bots[i].shuriken = true
                 }
             }
             
@@ -131,15 +117,15 @@ struct TM_Model{
         if winCondition(){
             
             // if level 10 has been reached, the game was won, otherwise level up
-            if level >= 10{
+            if level >= lastLevel{
                 showPopupWon = true
                 botsActive = false
             }else{
                 levelUp()
+                // variables for UI popup
                 activateView = false
                 showPopupWin = true
                 botsActive = false
-                player.shuriken = false
             }
         }
         
@@ -147,16 +133,12 @@ struct TM_Model{
         else if looseCondition(){
             
             // game over
-            if life <= 1{
+            if lives <= 1{
                 showPopupOver = true
                 botsActive = false
             }else{
-                removeCards()
-                life -= 1
-                lifeLost = true
-                generateChunks(bias: true)
-                gameChange = true
-                //popup
+                looseLife()
+                // variables for UI popup
                 activateView = false
                 showPopupLost = true
                 botsActive = false
@@ -174,9 +156,26 @@ struct TM_Model{
     }
     
     // MARK: - GAME LOGIC
-    // generates a deck of 100 cards.
-    mutating func generateBotArray(){
-        bots = Array<Bot>()
+    // starts the game with selected variables
+    mutating func startGame(){
+        
+        if nBots == 1{
+            lives = 2
+            shurikens = 1
+            lastLevel = 12
+        } else if nBots == 2{
+            lives = 3
+            shurikens = 1
+            lastLevel = 10
+        } else{
+            lives = 4
+            shurikens = 1
+            lastLevel = 8
+        }
+        
+        deck = generateDeck()
+        
+        player.hand = generateHand()
         for i in 0..<nBots{
             let bot = Bot(id: i, hand: generateHand())
             bots.append(bot)
@@ -208,7 +207,7 @@ struct TM_Model{
     mutating func levelUp(){
         
         if level == 3 || level == 6 || level == 9{
-            life += 1
+            lives += 1
             print("EXTRA LIFE")
         }
         
@@ -220,10 +219,13 @@ struct TM_Model{
         level += 1
         
         deck = generateDeck()
+        
         player.hand = generateHand()
+        player.shuriken = false
         
         for i in 0..<bots.count{
             bots[i].hand = generateHand()
+            bots[i].shuriken = false
         }
         
         boardCard = Card(id: 0, value: 0)
@@ -231,7 +233,11 @@ struct TM_Model{
     }
     
     // removes all cards lower then the current board card
-    mutating func removeCards(){
+    mutating func looseLife(){
+        
+        lives -= 1
+        lifeLost = true
+        generateChunks(bias: true)
         
         while player.hand.count != 0 && player.hand[player.hand.count - 1].value < boardCard.value {
             player.hand.removeLast()
@@ -242,6 +248,12 @@ struct TM_Model{
                 bots[i].hand.removeLast()
             }
         }
+        
+        for i in 0..<bots.count{
+            bots[i].shuriken = false
+        }
+        
+        gameChange = true
     }
     
     // checks if the game has been won
@@ -308,11 +320,16 @@ struct TM_Model{
         }
         
         for i in 0..<bots.count where bots[i].hand.count != 0 {
-                revealedCards.append(bots[i].hand.last!)
+            revealedCards.append(bots[i].hand.last!)
         }
         
         revealedCards.sort{$0.value < $1.value}
         player.shuriken = false
+        
+        for i in 0..<bots.count{
+            bots[i].shuriken = false
+        }
+        
         gameChange = true
     }
     
@@ -355,7 +372,7 @@ struct TM_Model{
     mutating func AI(){
         gameState = 4
     }
-
+    
     // restarts the game at level 1 when the cross is clicked.
     mutating func reset(){
         self = TM_Model()
@@ -396,7 +413,7 @@ struct Card: Identifiable {
 // MARK: - Player
 struct Player: Identifiable{
     var id = "player"
-    var hand: Array<Card>
+    var hand: Array<Card> = Array<Card>()
     var shuriken = false
     var gameDifficuly = 1.0
 }
