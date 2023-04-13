@@ -27,7 +27,7 @@ struct MenuView: View {
                 // Buttons
                 VStack(spacing: 15) {
                     Button(action: {
-                        game.play()
+                        game.AI()
                     }) {
                         Text("Play")
                             .font(.title)

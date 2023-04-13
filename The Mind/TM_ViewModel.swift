@@ -81,14 +81,27 @@ class TM_ViewModel: ObservableObject{
         return model.shurikens
     }
     
+    var nBots: Int{
+        return model.nBots
+    }
+    
+    var difficultyLevel: Double {
+        return model.player.gameDifficuly
+    }
+    
     // MARK: - MENU CONTROLS
     func play(){
         model.play()
+        model.generateBotArray()
         looper()
     }
     
     func instructions(){
         model.instructions()
+    }
+    
+    func AI(){
+        model.AI()
     }
     
     func menu(){
@@ -110,6 +123,14 @@ class TM_ViewModel: ObservableObject{
     
     func reset(){
         model.reset()
+    }
+    
+    func setBots(bots: Int){
+        model.nBots = bots
+    }
+    
+    func setDifficulty(difficulty: Double){
+        model.player.gameDifficuly = difficulty
     }
     
     var playerShuriken: Bool{

@@ -10,6 +10,7 @@ struct TM_Model{
     // 1 = Main Menu
     // 2 = Game
     // 3 = Instructions
+    /// 4 = Ai View
     
     // UI popups
     var showPopupWin: Bool = false
@@ -38,7 +39,7 @@ struct TM_Model{
     // bots
     var bots: Array<Bot>
     var botsActive = false
-    var nBots = 3
+    var nBots: Int = 3
     
     // bot model
     var trial: Int = 0
@@ -174,6 +175,14 @@ struct TM_Model{
     
     // MARK: - GAME LOGIC
     // generates a deck of 100 cards.
+    mutating func generateBotArray(){
+        bots = Array<Bot>()
+        for i in 0..<nBots{
+            let bot = Bot(id: i, hand: generateHand())
+            bots.append(bot)
+        }
+    }
+    
     mutating func generateDeck() -> Array<Card>{
         var deck = Array<Card>()
         for i in 1..<(101){
@@ -340,6 +349,11 @@ struct TM_Model{
     // changes the state to the instructions
     mutating func instructions(){
         gameState = 3
+    }
+    
+    // changes the state to the ai view
+    mutating func AI(){
+        gameState = 4
     }
 
     // restarts the game at level 1 when the cross is clicked.
