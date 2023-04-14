@@ -57,7 +57,7 @@ struct TM_Model{
         for i in 0..<bots.count{
             if !bots[i].hand.isEmpty{
                 let x = Double(round(100 * bots[i].estimate) / 100)
-                print("BOT \(bots[i].id) - ESTIMATE: \(x)s - CARD: \(bots[i].hand[bots[i].hand.count - 1].value) - JOKER: \(bots[i].shuriken) - EMOTION: \(bots[i].emotion) - SCALAR: \(bots[i].scalar)")
+                print("BOT \(bots[i].id) - ESTIMATE: \(x)s - CARD: \(bots[i].hand[bots[i].hand.count - 1].value) - JOKER: \(bots[i].shuriken) - EMOTION: \(bots[i].emotion)")
             }
         }
         
